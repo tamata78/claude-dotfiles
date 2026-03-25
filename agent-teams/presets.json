@@ -1,0 +1,117 @@
+{
+  "simple": {
+    "description": "設計・実装 + Devil's Advocate (2体) - 日常開発向けデフォルト",
+    "roles": [
+      {
+        "name": "implementer",
+        "prompt_file": "implementer.md",
+        "description": "設計・実装を担当する万能型エンジニア"
+      },
+      {
+        "name": "devils-advocate",
+        "prompt_file": "devils-advocate.md",
+        "description": "問題点・リスク・代替案を積極的に指摘する批判的思考担当"
+      }
+    ]
+  },
+  "plan": {
+    "description": "リーダー + 設計 + 設計レビュー (3体) - 設計フェーズ向け",
+    "roles": [
+      {
+        "name": "leader",
+        "prompt_file": "leader.md",
+        "description": "タスク分解・進捗管理を行うチームリーダー"
+      },
+      {
+        "name": "architect",
+        "prompt_file": "architect.md",
+        "description": "要件分析・全体設計を担当する設計者"
+      },
+      {
+        "name": "design-reviewer",
+        "prompt_file": "design-reviewer.md",
+        "description": "アーキテクチャ整合性・スケーラビリティをレビューする設計レビュアー"
+      }
+    ]
+  },
+  "build": {
+    "description": "リーダー + 実装 + テスト + コードレビュー (4体) - 実装フェーズ向け",
+    "roles": [
+      {
+        "name": "leader",
+        "prompt_file": "leader.md",
+        "description": "タスク分解・進捗管理を行うチームリーダー"
+      },
+      {
+        "name": "implementer",
+        "prompt_file": "implementer.md",
+        "description": "設計・実装を担当する万能型エンジニア"
+      },
+      {
+        "name": "test-writer",
+        "prompt_file": "test-writer.md",
+        "description": "ユニット・インテグレーション・E2Eテストを作成するテストエンジニア"
+      },
+      {
+        "name": "code-reviewer",
+        "prompt_file": "code-reviewer.md",
+        "description": "コード品質・バグ・セキュリティをレビューするコードレビュアー"
+      }
+    ]
+  },
+  "full-plan": {
+    "description": "リーダー + 設計 + 設計レビュー + UIレビュー (4体) - 大規模設計向け",
+    "roles": [
+      {
+        "name": "leader",
+        "prompt_file": "leader.md",
+        "description": "タスク分解・進捗管理を行うチームリーダー"
+      },
+      {
+        "name": "architect",
+        "prompt_file": "architect.md",
+        "description": "要件分析・全体設計を担当する設計者"
+      },
+      {
+        "name": "design-reviewer",
+        "prompt_file": "design-reviewer.md",
+        "description": "アーキテクチャ整合性・スケーラビリティをレビューする設計レビュアー"
+      },
+      {
+        "name": "ui-reviewer",
+        "prompt_file": "ui-reviewer.md",
+        "description": "UI/UXアクセシビリティ・一貫性をレビューするUIレビュアー"
+      }
+    ]
+  },
+  "full-build": {
+    "description": "リーダー + フロント + バック + テスト + コードレビュー (5体) - 大規模実装向け",
+    "roles": [
+      {
+        "name": "leader",
+        "prompt_file": "leader.md",
+        "description": "タスク分解・進捗管理を行うチームリーダー"
+      },
+      {
+        "name": "frontend",
+        "prompt_file": "frontend-dev.md",
+        "description": "UI・コンポーネント・状態管理を担当するフロントエンドエンジニア"
+      },
+      {
+        "name": "backend",
+        "prompt_file": "backend-dev.md",
+        "description": "API・DB・ビジネスロジックを担当するバックエンドエンジニア"
+      },
+      {
+        "name": "test-writer",
+        "prompt_file": "test-writer.md",
+        "description": "ユニット・インテグレーション・E2Eテストを作成するテストエンジニア"
+      },
+      {
+        "name": "code-reviewer",
+        "prompt_file": "code-reviewer.md",
+        "description": "コード品質・バグ・セキュリティをレビューするコードレビュアー"
+      }
+    ]
+  }
+}

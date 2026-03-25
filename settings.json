@@ -1,0 +1,102 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(vv:*)",
+      "Bash(vv-mute:*)",
+      "WebSearch",
+      "WebFetch",
+      "Bash(gh api *)",
+      "Bash(npm list *)",
+      "Bash(npx tsc --noEmit*)",
+      "Bash(which *)",
+      "Bash(ls *)",
+      "Bash(osascript *)",
+      "Bash(git * status*)",
+      "Bash(git * diff*)",
+      "Bash(git * log*)",
+      "Bash(pyenv *)",
+      "Bash(python3 *)",
+      "Bash(mkdir -p *)",
+      "Bash(npm install *)",
+      "Bash(npm init *)",
+      "Bash(npx *)",
+      "Bash(claude-team:*)",
+      "Bash(mgrep *)",
+      "Bash(rm *)",
+      "Bash(cd * && npm *)",
+      "Bash(cd * && npx *)",
+      "Bash(cd * && git *)",
+      "Bash(node *)"
+    ],
+    "deny": [
+      "Bash(sudo *)",
+      "Bash(rm -rf /*)",
+      "Bash(rm -rf ~*)",
+      "Bash(dd *)",
+      "Bash(mkfs*)",
+      "Bash(newfs*)",
+      "Bash(diskutil eraseDisk*)",
+      "Bash(diskutil reformat*)",
+      "Bash(defaults write *)",
+      "Bash(networksetup *)",
+      "Bash(chmod -R 777*)"
+    ]
+  },
+  "model": "opusplan",
+  "hooks": {
+    "PreCompact": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/tamata78/.claude/hooks/pre-compact-save.sh"
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /Users/tamata78/.claude/hooks/risk-analyzer.py"
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "/Users/tamata78/.claude/scripts/statusline-ring.py"
+  },
+  "enabledPlugins": {
+    "swift-lsp@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": true,
+    "ui-ux-pro-max@ui-ux-pro-max-skill": true
+  },
+  "extraKnownMarketplaces": {
+    "anthropic-agent-skills": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/skills"
+      }
+    },
+    "ui-ux-pro-max-skill": {
+      "source": {
+        "source": "github",
+        "repo": "nextlevelbuilder/ui-ux-pro-max-skill"
+      }
+    }
+  },
+  "voiceEnabled": true,
+  "mcpServers": {
+    "voicevox": {
+      "command": "npx",
+      "args": [
+        "@t09tanaka/mcp-simple-voicevox"
+      ]
+    }
+  }
+}

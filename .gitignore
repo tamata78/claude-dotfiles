@@ -1,0 +1,6 @@
+# ランタイムデータ（dotfiles管理対象外）
+*.bak
+.DS_Store
+
+# prompt-reviewの実行結果（プライベート）
+skills/prompt-review/reports/
