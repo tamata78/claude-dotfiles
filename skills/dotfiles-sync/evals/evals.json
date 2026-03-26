@@ -1,0 +1,81 @@
+{
+  "skill_name": "dotfiles-sync",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "さっき新しいスキルを作ったんだけど、claude-dotfilesに反映しておいて",
+      "expected_output": "新規スキルディレクトリを検出し、共通ファイルとして分類、dotfilesにコピーしてinstall.shを更新、コミットしてpushを促す",
+      "files": [],
+      "assertions": [
+        {
+          "name": "未管理スキルディレクトリを検出する",
+          "check": "シンボリックリンクでないskills/以下のディレクトリを発見し報告する"
+        },
+        {
+          "name": "スキルを共通として分類する",
+          "check": "skills/my-new-skill を common に分類する"
+        },
+        {
+          "name": "dotfilesにコピーする",
+          "check": "スキルファイルをdotfilesリポジトリにコピーする"
+        },
+        {
+          "name": "git commitを実行する",
+          "check": "git commit を自動実行し、コミットハッシュが生成される"
+        },
+        {
+          "name": "pushリマインダーを表示する",
+          "check": "git push コマンドをユーザーに案内する"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "dotfilesを整理して。新しいhookとコマンドを追加したんだけど、個人用のコマンドは入れないようにして",
+      "expected_output": "hookを共通として追加、個人用コマンドをプライベートとして除外、共通コマンドのみ追加、コミットしてpushを促す",
+      "files": [],
+      "assertions": [
+        {
+          "name": "hookを共通として追加する",
+          "check": "hooks/new-hook.sh をdotfilesに追加する"
+        },
+        {
+          "name": "汎用コマンドを追加する",
+          "check": "commands/generic-cmd.md をdotfilesに追加する"
+        },
+        {
+          "name": "個人用コマンドを除外する（最重要）",
+          "check": "commands/my-personal-cmd.md を除外し、dotfilesに追加しない"
+        },
+        {
+          "name": "除外理由を明示する",
+          "check": "個人用コマンドを除外した理由をレポートに記載する"
+        },
+        {
+          "name": "git commitを実行する",
+          "check": "git commit を自動実行する"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "dotfilesに最新の設定を同期して",
+      "expected_output": "ローカルパスが含まれるファイルを検出してブロック・修正提案し、問題のないファイルのみ同期、コミットしてpushを促す",
+      "files": [],
+      "assertions": [
+        {
+          "name": "ローカルパスを検出する",
+          "check": "scripts/new-script.py 内の /Users/tamata78/ を検出する"
+        },
+        {
+          "name": "該当ファイルの同期をブロックする",
+          "check": "new-script.py をdotfilesに追加しない"
+        },
+        {
+          "name": "$HOMEへの修正方法を提案する",
+          "check": "$HOME への置き換えを案内する"
+        }
+      ]
+    }
+  ]
+}

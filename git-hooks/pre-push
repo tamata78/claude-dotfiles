@@ -1,0 +1,150 @@
+#!/usr/bin/env bash
+# pre-push hook: ローカル固有パス・秘匿情報がgitにpushされることを防ぐ
+# インストール: install.sh が自動的に .git/hooks/pre-push にリンクする
+
+set -euo pipefail
+
+# ============================================================
+# チェックパターン定義
+# ============================================================
+
+# ローカルパス
+LOCAL_PATH_PATTERN='/Users/[^/]+'
+
+# 秘匿情報パターン（キー名=値 形式）
+SECRET_KEY_PATTERNS=(
+  # パスワード・シークレット
+  '(?i)(password|passwd|secret|api_secret)\s*[:=]\s*["\047]?[^\s"'\'']{6,}'
+  # トークン
+  '(?i)(token|access_token|refresh_token|auth_token)\s*[:=]\s*["\047]?[^\s"'\'']{10,}'
+  # APIキー各社
+  'sk-[A-Za-z0-9]{20,}'                           # OpenAI / Anthropic
+  'ghp_[A-Za-z0-9]{36}'                           # GitHub Personal Access Token
+  'github_pat_[A-Za-z0-9_]{82}'                   # GitHub Fine-grained PAT
+  'AIza[A-Za-z0-9_-]{35}'                         # Google API Key
+  'AKIA[A-Z0-9]{16}'                              # AWS Access Key ID
+  '[A-Za-z0-9/+]{40}'                             # AWS Secret (簡易)
+  'xox[bpoas]-[A-Za-z0-9-]+'                      # Slack Token
+  'EAA[A-Za-z0-9]+'                               # Facebook Token
+  # 秘密鍵
+  '-----BEGIN (RSA |EC |DSA |OPENSSH )?PRIVATE KEY'
+  # Basic認証URL
+  'https?://[^:]+:[^@]+@'
+)
+
+# 個人情報パターン
+PII_PATTERNS=(
+  # メールアドレス（汎用的なもの）
+  '[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}'
+  # 日本の電話番号
+  '0[0-9]{1,4}-[0-9]{1,4}-[0-9]{4}'
+  '0[0-9]{9,10}'
+)
+
+# ============================================================
+# チェック除外ファイル（パターン）
+# ============================================================
+EXCLUDE_PATTERNS=(
+  '\.git/'
+  '\.gitignore'
+  '.*\.md$'        # ドキュメント内の例示は除外（メール等の説明文）
+  '.*\.sample$'
+  '.*\.example$'
+  '.*test.*'
+  '.*spec.*'
+)
+
+should_exclude() {
+  local file="$1"
+  for pat in "${EXCLUDE_PATTERNS[@]}"; do
+    if echo "$file" | grep -qE "$pat"; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+# ============================================================
+# ファイルリスト取得 & チェック実行
+# ============================================================
+check_files() {
+  local files="$1"
+  local found=0
+
+  while IFS= read -r file; do
+    [ -f "$file" ] || continue
+    should_exclude "$file" && continue
+
+    # --- ローカルパスチェック ---
+    if grep -EnP "$LOCAL_PATH_PATTERN" "$file" 2>/dev/null | grep -qv "^Binary"; then
+      echo "❌ [pre-push] ローカル固有パスが検出されました:" >&2
+      echo "  ファイル: $file" >&2
+      grep -EnP "$LOCAL_PATH_PATTERN" "$file" 2>/dev/null | head -3 | sed 's/^/    /' >&2
+      echo "  💡 修正: /Users/username/... → \$HOME/... に変更してください" >&2
+      echo "" >&2
+      found=1
+    fi
+
+    # --- 秘匿情報チェック ---
+    for pattern in "${SECRET_KEY_PATTERNS[@]}"; do
+      if grep -EnP "$pattern" "$file" 2>/dev/null | grep -qv "^Binary"; then
+        echo "❌ [pre-push] 秘匿情報が検出されました:" >&2
+        echo "  ファイル: $file" >&2
+        grep -EnP "$pattern" "$file" 2>/dev/null | head -3 | sed 's/^/    /' | \
+          sed 's/\(.\{30\}\).*/\1...（省略）/' >&2
+        echo "  💡 修正: 値を環境変数や設定ファイル（.gitignore対象）に移してください" >&2
+        echo "" >&2
+        found=1
+        break
+      fi
+    done
+
+    # --- 個人情報チェック (メール・電話) ---
+    for pattern in "${PII_PATTERNS[@]}"; do
+      if grep -EnP "$pattern" "$file" 2>/dev/null | grep -qv "^Binary"; then
+        # gitconfigやURLの一部は誤検知しやすいので警告どまり
+        echo "⚠️  [pre-push] 個人情報の可能性がある記述が見つかりました（要確認）:" >&2
+        echo "  ファイル: $file" >&2
+        grep -EnP "$pattern" "$file" 2>/dev/null | head -3 | sed 's/^/    /' >&2
+        echo "  💡 意図的な場合はそのままpushできますが、本当に公開して問題ないか確認してください" >&2
+        echo "" >&2
+        # 個人情報は警告のみ（ブロックしない）
+        break
+      fi
+    done
+
+  done <<< "$files"
+
+  return $found
+}
+
+# ============================================================
+# メイン: pushされるコミット範囲のファイルをチェック
+# ============================================================
+overall_found=0
+
+while read local_ref local_sha remote_ref remote_sha; do
+  if [ "$local_sha" = "0000000000000000000000000000000000000000" ]; then
+    continue  # ブランチ削除は無視
+  fi
+
+  if [ "$remote_sha" = "0000000000000000000000000000000000000000" ]; then
+    files=$(git diff-tree --no-commit-id -r --name-only "$local_sha" 2>/dev/null \
+            || git ls-tree -r --name-only "$local_sha")
+  else
+    files=$(git diff --name-only "$remote_sha" "$local_sha" 2>/dev/null || true)
+  fi
+
+  [ -z "$files" ] && continue
+
+  if ! check_files "$files"; then
+    overall_found=1
+  fi
+done
+
+if [ "$overall_found" -ne 0 ]; then
+  echo "🚫 pushをブロックしました。上記の問題を修正してから再度pushしてください。" >&2
+  exit 1
+fi
+
+exit 0

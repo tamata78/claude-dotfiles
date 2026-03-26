@@ -82,13 +82,25 @@ link "scripts/statusline-ring.py"
 echo "--- スキル ---"
 mkdir -p "${CLAUDE_DIR}/skills"
 link_dir "skills/claude-md-improver"
+link_dir "skills/dotfiles-sync"
 link_dir "skills/feature-dev"
 link_dir "skills/prompt-review"
-link_dir "skills/skill-creator"
 
 # --- Agent Teams ---
 echo "--- Agent Teams ---"
 link_dir "agent-teams"
+
+# --- Git フック (リポジトリ自身) ---
+echo "--- Git フック ---"
+REPO_GIT_HOOKS="${DOTFILES_DIR}/.git/hooks"
+if [ -d "${REPO_GIT_HOOKS}" ]; then
+  if [ -e "${REPO_GIT_HOOKS}/pre-push" ] && [ ! -L "${REPO_GIT_HOOKS}/pre-push" ]; then
+    mv "${REPO_GIT_HOOKS}/pre-push" "${REPO_GIT_HOOKS}/pre-push.bak"
+  fi
+  ln -sf "${DOTFILES_DIR}/git-hooks/pre-push" "${REPO_GIT_HOOKS}/pre-push"
+  chmod +x "${DOTFILES_DIR}/git-hooks/pre-push"
+  echo "  [link]   .git/hooks/pre-push"
+fi
 
 echo ""
 echo "==> インストール完了"

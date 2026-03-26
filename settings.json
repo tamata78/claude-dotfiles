@@ -50,7 +50,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/tamata78/.claude/hooks/pre-compact-save.sh"
+            "command": "$HOME/.claude/hooks/pre-compact-save.sh"
           }
         ]
       }
@@ -61,7 +61,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 /Users/tamata78/.claude/hooks/risk-analyzer.py"
+            "command": "python3 $HOME/.claude/hooks/risk-analyzer.py"
           }
         ]
       }
@@ -69,7 +69,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "/Users/tamata78/.claude/scripts/statusline-ring.py"
+    "command": "$HOME/.claude/scripts/statusline-ring.py"
   },
   "enabledPlugins": {
     "swift-lsp@claude-plugins-official": true,

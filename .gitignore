@@ -4,3 +4,6 @@
 
 # prompt-reviewの実行結果（プライベート）
 skills/prompt-review/reports/
+
+# スキルのevalワークスペース（テスト実行結果）
+skills/*-workspace/
