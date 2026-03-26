@@ -148,12 +148,7 @@ git status
 ```bash
 cd "$DOTFILES_DIR"
 git add -A
-git commit -m "$(cat <<'EOF'
-<変更内容を端的に表すメッセージ>
-
-Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
-EOF
-)"
+git commit -m "<変更内容を端的に表すメッセージ>"
 ```
 
 コミット完了後、必ず以下のメッセージをユーザーに伝える：
