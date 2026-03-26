@@ -109,7 +109,7 @@ grep -EnP '(?i)(password|secret|token|api_key)\s*[:=]\s*\S{6,}|sk-[A-Za-z0-9]{20
   [要確認] hooks/new-hook.sh → 共通？プライベート？
 
 ⚠️ 問題あり（要修正）:
-  - scripts/foo.py: ローカルパス /Users/tamata78/ を含む
+  - scripts/foo.py: ローカルパス /Users/username/ を含む
 ```
 
 同期してよいか確認してから次のステップへ進む。
