@@ -65,7 +65,7 @@
       "assertions": [
         {
           "name": "ローカルパスを検出する",
-          "check": "scripts/new-script.py 内の /Users/tamata78/ を検出する"
+          "check": "scripts/new-script.py 内の /Users/<username>/ を検出する"
         },
         {
           "name": "該当ファイルの同期をブロックする",

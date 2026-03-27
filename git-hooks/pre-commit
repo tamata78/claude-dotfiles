@@ -1,0 +1,231 @@
+#!/usr/bin/env bash
+# pre-commit hook (global): コミット前にステージされたファイルの秘匿情報・ローカルパスを検査する
+# git config --global core.hooksPath で全プロジェクトに適用
+# install.sh が自動セットアップする
+#
+# macOS 標準 grep (BSD grep) 互換: -P (Perl regex) は使用しない
+
+set -euo pipefail
+
+# ============================================================
+# プロジェクトローカルの pre-commit hook をチェーン実行
+# core.hooksPath 設定時はローカル .git/hooks/ が無視されるため、
+# ここで明示的に呼び出す
+# ============================================================
+chain_local_hook() {
+  local git_dir
+  git_dir="$(git rev-parse --git-dir 2>/dev/null)" || return 0
+  local local_hook="${git_dir}/hooks/pre-commit.local"
+
+  # .local サフィックス付きのフックがあれば実行
+  if [ -x "${local_hook}" ]; then
+    "${local_hook}" "$@"
+    return $?
+  fi
+
+  # husky / lefthook 等のフックランナー
+  local repo_root
+  repo_root="$(git rev-parse --show-toplevel 2>/dev/null)" || return 0
+  for runner in ".husky/pre-commit" ".lefthook/pre-commit"; do
+    if [ -x "${repo_root}/${runner}" ]; then
+      "${repo_root}/${runner}" "$@"
+      return $?
+    fi
+  done
+
+  return 0
+}
+
+# ============================================================
+# チェックパターン定義 (POSIX Extended Regex — grep -E 互換)
+# ============================================================
+
+# ローカルパス
+LOCAL_PATH_PATTERN='/Users/[^/]+'
+
+# 秘匿情報パターン
+SECRET_KEY_PATTERNS=(
+  # パスワード・シークレット (case-insensitive は grep -i で対応)
+  '(password|passwd|secret|api_secret)[[:space:]]*[:=][[:space:]]*["\047]?[^[:space:]"'\'']{6,}'
+  # トークン
+  '(token|access_token|refresh_token|auth_token)[[:space:]]*[:=][[:space:]]*["\047]?[^[:space:]"'\'']{10,}'
+  # APIキー各社
+  'sk-[A-Za-z0-9]{20,}'                            # OpenAI / Anthropic
+  'ghp_[A-Za-z0-9]{36}'                             # GitHub Personal Access Token
+  'github_pat_[A-Za-z0-9_]{82}'                     # GitHub Fine-grained PAT
+  'AIza[A-Za-z0-9_-]{35}'                           # Google API Key
+  'AKIA[A-Z0-9]{16}'                                # AWS Access Key ID
+  'xox[bpoas]-[A-Za-z0-9-]+'                        # Slack Token
+  'EAA[A-Za-z0-9]+'                                 # Facebook Token
+  # 秘密鍵
+  '-----BEGIN (RSA |EC |DSA |OPENSSH )?PRIVATE KEY'
+  # Basic認証URL
+  'https?://[^:]+:[^@]+@'
+)
+
+# case-insensitive で検索すべきパターンのインデックス (0-based)
+# パスワード(0), トークン(1)
+CI_PATTERN_INDICES="0 1"
+
+# 個人情報パターン
+PII_PATTERNS=(
+  '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'
+  '0[0-9]{1,4}-[0-9]{1,4}-[0-9]{4}'
+  '0[0-9]{9,10}'
+)
+
+# ============================================================
+# チェック除外ファイル
+# ============================================================
+
+# ローカルパスチェック用除外（mdは例示が多いため除外）
+EXCLUDE_PATH_PATTERNS=(
+  '\.gitignore$'
+  '\.md$'
+  '\.sample$'
+  '\.example$'
+  '\.lock$'
+  '\.min\.js$'
+  '\.min\.css$'
+)
+
+# 秘匿情報チェック用除外
+EXCLUDE_SECRET_PATTERNS=(
+  '\.gitignore$'
+  '\.sample$'
+  '\.example$'
+  '\.lock$'
+  '\.min\.js$'
+  '\.min\.css$'
+)
+
+match_exclude() {
+  local file="$1"
+  shift
+  for pat in "$@"; do
+    if echo "$file" | grep -qE "$pat"; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+# grep ラッパー: パターンインデックスに応じて -i を付与
+grep_pattern() {
+  local idx="$1"
+  local pattern="$2"
+  shift 2
+  local ci_flag=""
+  for ci_idx in $CI_PATTERN_INDICES; do
+    if [ "$idx" = "$ci_idx" ]; then
+      ci_flag="-i"
+      break
+    fi
+  done
+  # shellcheck disable=SC2086
+  grep -En $ci_flag "$pattern" "$@" 2>/dev/null || true
+}
+
+grep_pattern_stdin() {
+  local idx="$1"
+  local pattern="$2"
+  local ci_flag=""
+  for ci_idx in $CI_PATTERN_INDICES; do
+    if [ "$idx" = "$ci_idx" ]; then
+      ci_flag="-i"
+      break
+    fi
+  done
+  # shellcheck disable=SC2086
+  grep -En $ci_flag "$pattern" 2>/dev/null || true
+}
+
+# ============================================================
+# ステージされたファイルをチェック
+# ============================================================
+check_staged_files() {
+  local found=0
+
+  # ステージされたファイル一覧（追加・変更のみ。削除は無視）
+  local files
+  files=$(git diff --cached --name-only --diff-filter=ACM 2>/dev/null) || return 0
+  [ -z "$files" ] && return 0
+
+  while IFS= read -r file; do
+    [ -f "$file" ] || continue
+
+    # ステージされた内容を一時取得
+    local staged_content
+    staged_content=$(git show ":${file}" 2>/dev/null) || continue
+
+    # --- ローカルパスチェック ---
+    if ! match_exclude "$file" "${EXCLUDE_PATH_PATTERNS[@]}"; then
+      local path_matches
+      path_matches=$(echo "$staged_content" | grep -En "$LOCAL_PATH_PATTERN" 2>/dev/null | grep -v "^Binary" || true)
+      if [ -n "$path_matches" ]; then
+        echo "❌ [pre-commit] ローカル固有パスが検出されました:" >&2
+        echo "  ファイル: $file" >&2
+        echo "$path_matches" | head -3 | sed 's/^/    /' >&2
+        echo "  💡 修正: /Users/username/... → \$HOME/... に変更してください" >&2
+        echo "" >&2
+        found=1
+      fi
+    fi
+
+    # --- 秘匿情報チェック ---
+    if ! match_exclude "$file" "${EXCLUDE_SECRET_PATTERNS[@]}"; then
+      local idx=0
+      for pattern in "${SECRET_KEY_PATTERNS[@]}"; do
+        local secret_matches
+        secret_matches=$(echo "$staged_content" | grep_pattern_stdin "$idx" "$pattern" | grep -v "^Binary" || true)
+        if [ -n "$secret_matches" ]; then
+          echo "❌ [pre-commit] 秘匿情報が検出されました:" >&2
+          echo "  ファイル: $file" >&2
+          echo "$secret_matches" | head -3 | sed 's/^/    /' | \
+            sed 's/\(.\{30\}\).*/\1...（省略）/' >&2
+          echo "  💡 修正: 値を環境変数や設定ファイル（.gitignore対象）に移してください" >&2
+          echo "" >&2
+          found=1
+          break
+        fi
+        idx=$((idx + 1))
+      done
+    fi
+
+    # --- 個人情報チェック (警告のみ) ---
+    if ! match_exclude "$file" "${EXCLUDE_SECRET_PATTERNS[@]}"; then
+      for pattern in "${PII_PATTERNS[@]}"; do
+        local pii_matches
+        pii_matches=$(echo "$staged_content" | grep -En "$pattern" 2>/dev/null | grep -v "^Binary" || true)
+        if [ -n "$pii_matches" ]; then
+          echo "⚠️  [pre-commit] 個人情報の可能性がある記述が見つかりました（要確認）:" >&2
+          echo "  ファイル: $file" >&2
+          echo "$pii_matches" | head -3 | sed 's/^/    /' >&2
+          echo "  💡 意図的な場合は git commit --no-verify でスキップできます" >&2
+          echo "" >&2
+          break
+        fi
+      done
+    fi
+
+  done <<< "$files"
+
+  return $found
+}
+
+# ============================================================
+# メイン
+# ============================================================
+
+# 1. セキュリティチェック
+check_result=0
+check_staged_files || check_result=$?
+
+if [ "$check_result" -ne 0 ]; then
+  echo "🚫 コミットをブロックしました。上記の問題を修正してから再度コミットしてください。" >&2
+  echo "   （意図的な場合は git commit --no-verify でスキップ可能）" >&2
+  exit 1
+fi
+
+# 2. プロジェクトローカルのhookをチェーン実行
+chain_local_hook "$@"

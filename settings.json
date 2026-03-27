@@ -10,28 +10,33 @@
       "Bash(npx tsc --noEmit*)",
       "Bash(which *)",
       "Bash(ls *)",
-      "Bash(osascript *)",
       "Bash(git * status*)",
       "Bash(git * diff*)",
       "Bash(git * log*)",
       "Bash(pyenv *)",
-      "Bash(python3 *)",
+      "Bash(python3 $HOME/.claude/*)",
+      "Bash(python3 -m pytest *)",
+      "Bash(python3 -m pip *)",
       "Bash(mkdir -p *)",
       "Bash(npm install *)",
       "Bash(npm init *)",
-      "Bash(npx *)",
+      "Bash(npx tsc *)",
+      "Bash(npx @t09tanaka/mcp-simple-voicevox*)",
       "Bash(claude-team:*)",
       "Bash(mgrep *)",
-      "Bash(rm *)",
       "Bash(cd * && npm *)",
-      "Bash(cd * && npx *)",
-      "Bash(cd * && git *)",
-      "Bash(node *)"
+      "Bash(cd * && npx tsc *)",
+      "Bash(cd * && git status*)",
+      "Bash(cd * && git diff*)",
+      "Bash(cd * && git log*)",
+      "Bash(cd * && git add *)",
+      "Bash(cd * && git commit *)",
+      "Bash(node $HOME/.claude/*)"
     ],
     "deny": [
       "Bash(sudo *)",
-      "Bash(rm -rf /*)",
-      "Bash(rm -rf ~*)",
+      "Bash(python3 -c *)",
+      "Bash(node -e *)",
       "Bash(dd *)",
       "Bash(mkfs*)",
       "Bash(newfs*)",
@@ -44,6 +49,17 @@
   },
   "model": "opusplan",
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/session-start-snapshot.sh",
+            "statusMessage": "スナップショットを確認中..."
+          }
+        ]
+      }
+    ],
     "PreCompact": [
       {
         "matcher": ".*",
@@ -73,20 +89,13 @@
   },
   "enabledPlugins": {
     "swift-lsp@claude-plugins-official": true,
-    "skill-creator@claude-plugins-official": true,
-    "ui-ux-pro-max@ui-ux-pro-max-skill": true
+    "skill-creator@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "anthropic-agent-skills": {
       "source": {
         "source": "github",
         "repo": "anthropics/skills"
-      }
-    },
-    "ui-ux-pro-max-skill": {
-      "source": {
-        "source": "github",
-        "repo": "nextlevelbuilder/ui-ux-pro-max-skill"
       }
     }
   },

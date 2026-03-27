@@ -35,7 +35,7 @@ def fmt_reset(resets_at: Optional[object], mode: str) -> str:
         if mode == "hour":
             return dt_jst.strftime("→%H:%M")
         else:
-            return dt_jst.strftime(f"→{dt_jst.month}/{dt_jst.day:02d}")
+            return dt_jst.strftime(f"→{dt_jst.month}/{dt_jst.day:02d} %H:%M")
     except Exception:
         return ""
 

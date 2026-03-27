@@ -2,8 +2,13 @@
 *.bak
 .DS_Store
 
-# prompt-reviewの実行結果（プライベート）
-skills/prompt-review/reports/
+# 環境変数・シークレット
+.env
+.env.*
+*.log
+
+# マシン固有設定
+settings.local.json
 
 # スキルのevalワークスペース（テスト実行結果）
 skills/*-workspace/
