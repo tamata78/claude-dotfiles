@@ -84,22 +84,41 @@ mkdir -p "${CLAUDE_DIR}/skills"
 link_dir "skills/claude-md-improver"
 link_dir "skills/dotfiles-sync"
 link_dir "skills/feature-dev"
+link_dir "skills/project-snapshot"
 link_dir "skills/prompt-review"
+link_dir "skills/token-audit"
 
 # --- Agent Teams ---
 echo "--- Agent Teams ---"
 link_dir "agent-teams"
 
-# --- Git フック (リポジトリ自身) ---
-echo "--- Git フック ---"
+# --- グローバル Git フック ---
+echo "--- グローバル Git フック ---"
+GLOBAL_HOOKS_DIR="${CLAUDE_DIR}/git-hooks"
+mkdir -p "${GLOBAL_HOOKS_DIR}"
+
+# pre-commit hook をリンク
+if [ -e "${GLOBAL_HOOKS_DIR}/pre-commit" ] && [ ! -L "${GLOBAL_HOOKS_DIR}/pre-commit" ]; then
+  mv "${GLOBAL_HOOKS_DIR}/pre-commit" "${GLOBAL_HOOKS_DIR}/pre-commit.bak"
+elif [ -L "${GLOBAL_HOOKS_DIR}/pre-commit" ]; then
+  rm "${GLOBAL_HOOKS_DIR}/pre-commit"
+fi
+ln -s "${DOTFILES_DIR}/git-hooks/pre-commit" "${GLOBAL_HOOKS_DIR}/pre-commit"
+chmod +x "${DOTFILES_DIR}/git-hooks/pre-commit"
+echo "  [link]   ${GLOBAL_HOOKS_DIR}/pre-commit"
+
+# core.hooksPath をグローバル設定（全プロジェクトに適用）
+git config --global core.hooksPath "${GLOBAL_HOOKS_DIR}"
+echo "  [config] git core.hooksPath -> ${GLOBAL_HOOKS_DIR}"
+echo ""
+echo "  注意: プロジェクト固有のhookは .git/hooks/pre-commit.local に"
+echo "        リネームするか、husky/.lefthook を使えば自動チェーンされます"
+
+# --- 旧 pre-push hook のクリーンアップ ---
 REPO_GIT_HOOKS="${DOTFILES_DIR}/.git/hooks"
-if [ -d "${REPO_GIT_HOOKS}" ]; then
-  if [ -e "${REPO_GIT_HOOKS}/pre-push" ] && [ ! -L "${REPO_GIT_HOOKS}/pre-push" ]; then
-    mv "${REPO_GIT_HOOKS}/pre-push" "${REPO_GIT_HOOKS}/pre-push.bak"
-  fi
-  ln -sf "${DOTFILES_DIR}/git-hooks/pre-push" "${REPO_GIT_HOOKS}/pre-push"
-  chmod +x "${DOTFILES_DIR}/git-hooks/pre-push"
-  echo "  [link]   .git/hooks/pre-push"
+if [ -L "${REPO_GIT_HOOKS}/pre-push" ]; then
+  rm "${REPO_GIT_HOOKS}/pre-push"
+  echo "  [cleanup] 旧 .git/hooks/pre-push シンボリックリンクを削除"
 fi
 
 echo ""

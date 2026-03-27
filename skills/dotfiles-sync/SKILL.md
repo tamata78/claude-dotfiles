@@ -166,9 +166,35 @@ git commit -m "<変更内容を端的に表すメッセージ>"
 
 **pushは絶対に自動で実行しない。** ユーザーが明示的に依頼した場合のみ実行する。
 
+## ステップ8: Dev Portal設定同期（オプション）
+
+dotfilesの変更をDev Portalのデータにも反映する。
+
+```bash
+# Dev Portalリポジトリを探す
+DEV_PORTAL_DIR=""
+for candidate in "$HOME/work/dev_portal" "$HOME/dev_portal"; do
+  if [ -f "$candidate/portal.config.json" ]; then
+    DEV_PORTAL_DIR="$candidate"
+    break
+  fi
+done
+```
+
+- **見つかった場合**: 以下を実行する
+  ```bash
+  cd "$DEV_PORTAL_DIR" && npm run sync
+  ```
+  完了したらユーザーに「Dev Portalの設定同期も完了しました」と報告する。
+
+- **見つからなかった場合**: サイレントスキップ。エラーにしない。ユーザーへの報告も不要。
+
+※ `data/` はgit管理外のため、このステップでコミット・pushは不要。
+
 ## 注意事項
 
 - **`.bak` ファイルは無視する** - install.sh が生成するバックアップであり管理対象外
 - **plugins/cache/ は無視する** - プラグインのキャッシュは自動生成物
 - **install.sh の冪等性を維持する** - 同じファイルへのリンクが重複しないよう確認する
 - **新しいスキルを追加する場合は `link_dir` を使う** - ディレクトリごとリンクする
+- **Dev Portal同期はオプション** - `portal.config.json` の存在で判定。dev_portalがない環境ではスキップされる
