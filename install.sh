@@ -71,7 +71,9 @@ echo "--- フック ---"
 mkdir -p "${CLAUDE_DIR}/hooks"
 link "hooks/pre-compact-save.sh"
 link "hooks/risk-analyzer.py"
+link "hooks/session-start-snapshot.sh"
 chmod +x "${DOTFILES_DIR}/hooks/pre-compact-save.sh"
+chmod +x "${DOTFILES_DIR}/hooks/session-start-snapshot.sh"
 
 # --- スクリプト ---
 echo "--- スクリプト ---"

@@ -108,6 +108,28 @@ echo ".claude/" >> {project_root}/.gitignore
 
 ---
 
+## ステップ3.5: アクティブなプランを snapshot.md に埋め込む
+
+`~/.claude/plans/` 内のプランファイルからこのプロジェクトに関連するものを検索し、あれば snapshot.md に埋め込む。
+
+```bash
+grep -rl "{project_name}" ~/.claude/plans/ 2>/dev/null | xargs ls -t 2>/dev/null | head -3
+```
+
+見つかったプランファイルを読み込み、snapshot.md の末尾に以下のセクションとして追記する（プランが既にある場合は上書き更新）：
+
+```markdown
+## アクティブなプラン
+
+> プランファイル: ~/.claude/plans/{filename}.md（{YYYY-MM-DD}作成）
+
+{プランの「対応内容」「実装ファイル一覧」「実装手順」セクションをそのまま貼り付け}
+```
+
+プランが見つからない場合はこのステップをスキップする（確認不要）。
+
+---
+
 ## ステップ4: 完了通知
 
 ```bash

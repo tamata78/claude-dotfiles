@@ -9,6 +9,27 @@ CWD=$(echo "$INPUT" | jq -r '.cwd // ""')
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 OUTPUT_FILE="$HOME/.claude/context/last-session.md"
 
+# トランスクリプトのファイル操作ツール呼び出しから最も多く参照されたプロジェクトを検出
+DETECTED_PROJECT=""
+if [ -f "$TRANSCRIPT" ]; then
+  DETECTED_PROJECT=$(jq -r '
+    select(type == "object") |
+    select(.type == "assistant") |
+    .message.content[]? |
+    select(.type == "tool_use") |
+    select(.name | test("Read|Edit|Write|Glob|Grep")) |
+    (.input.file_path // .input.path // .input.pattern // "") |
+    select(length > 0) |
+    select(startswith("/"))
+  ' "$TRANSCRIPT" 2>/dev/null | \
+    grep -oE '/[^/]+/[^/]+/work/[^/ ]+' | \
+    grep -oE '/[^/]+/[^/]+/work/[^/]+' | \
+    sort | uniq -c | sort -rn | awk 'NR==1{print $2}')
+fi
+
+# 検出できなかった場合は CWD をフォールバックとして使用
+ACTIVE_PROJECT="${DETECTED_PROJECT:-$CWD}"
+
 # トランスクリプトが存在しない場合はスキップ
 if [ -z "$TRANSCRIPT" ] || [ ! -f "$TRANSCRIPT" ]; then
   exit 0
@@ -51,6 +72,7 @@ cat > "$OUTPUT_FILE" << EOF
 - **保全日時**: $TIMESTAMP
 - **セッションID**: $SESSION_ID
 - **作業ディレクトリ**: $CWD
+- **作業プロジェクト**: $ACTIVE_PROJECT
 - **Compactトリガー**: $TRIGGER
 
 ## 直近のユーザーメッセージ（最大5件）
