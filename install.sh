@@ -144,6 +144,24 @@ if [ -L "${REPO_GIT_HOOKS}/pre-push" ]; then
   echo "  [cleanup] 旧 .git/hooks/pre-push シンボリックリンクを削除"
 fi
 
+# --- ホームディレクトリのdotfiles ---
+echo "--- ホームディレクトリ ---"
+link_home() {
+  local src="${DOTFILES_DIR}/${1}"
+  local dst="${HOME}/${1}"
+
+  if [ -e "${dst}" ] && [ ! -L "${dst}" ]; then
+    echo "  [backup] ${dst} -> ${dst}.bak"
+    mv "${dst}" "${dst}.bak"
+  elif [ -L "${dst}" ]; then
+    rm "${dst}"
+  fi
+
+  ln -s "${src}" "${dst}"
+  echo "  [link]   ${dst}"
+}
+link_home ".tmux.conf"
+
 echo ""
 echo "==> インストール完了"
 echo ""
