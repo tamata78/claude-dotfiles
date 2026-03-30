@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Ring Meter status line for Claude Code - Pattern 3"""
 import json
+import os
+import subprocess
 import sys
 from datetime import datetime, timezone, timedelta
 from typing import Optional
@@ -39,6 +41,39 @@ def fmt_reset(resets_at: Optional[object], mode: str) -> str:
     except Exception:
         return ""
 
+def get_git_info() -> str:
+    """Get current git branch and dirty status."""
+    try:
+        branch = subprocess.check_output(
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+            stderr=subprocess.DEVNULL, timeout=1
+        ).decode().strip()
+        if branch == "HEAD":
+            return ""
+        # Check for uncommitted changes
+        dirty = subprocess.call(
+            ["git", "diff", "--quiet"],
+            stderr=subprocess.DEVNULL, timeout=1
+        ) != 0
+        staged = subprocess.call(
+            ["git", "diff", "--cached", "--quiet"],
+            stderr=subprocess.DEVNULL, timeout=1
+        ) != 0
+        marker = "*" if (dirty or staged) else ""
+        return f"\ue0a0 {branch}{marker}"
+    except Exception:
+        return ""
+
+def get_project_name() -> str:
+    """Get current project name from CWD."""
+    cwd = os.getcwd()
+    home = os.path.expanduser("~")
+    if cwd == home or cwd.startswith(home + "/work") and cwd.count("/") <= home.count("/") + 2:
+        parts = cwd.split("/")
+        return parts[-1] if parts[-1] else ""
+    parts = cwd.split("/")
+    return parts[-1] if parts[-1] else ""
+
 def main():
     try:
         data = json.load(sys.stdin)
@@ -52,6 +87,11 @@ def main():
     now_jst = datetime.now(JST)
     line1_parts.append(now_jst.strftime("%H:%M"))
 
+    # Project name
+    project = get_project_name()
+    if project and project not in ("work", "tamata78", ""):
+        line1_parts.append(f"📁 {project}")
+
     # Model name
     model_obj = data.get("model", {})
     if isinstance(model_obj, dict):
@@ -63,6 +103,11 @@ def main():
         line1_parts.append(f"\U0001f916 {short}")
     else:
         line1_parts.append("\U0001f916 Claude Code")
+
+    # Git branch info → line1
+    git_info = get_git_info()
+    if git_info:
+        line1_parts.append(git_info)
 
     # Context window usage → line2
     ctx = data.get("context_window", {})
@@ -88,6 +133,22 @@ def main():
         ring = make_ring(pct, 4)
         reset_str = fmt_reset(seven_day.get("resets_at"), "day")
         line2_parts.append(color(f"7d {ring} {pct:.0f}%{reset_str}", pct))
+
+    # Session elapsed time
+    session_start_file = os.path.expanduser("~/.claude/session-env/current-start")
+    try:
+        if os.path.exists(session_start_file):
+            with open(session_start_file) as f:
+                start_ts = float(f.read().strip())
+            elapsed_sec = (datetime.now().timestamp() - start_ts)
+            elapsed_min = int(elapsed_sec / 60)
+            if elapsed_min >= 60:
+                elapsed_str = f"{elapsed_min // 60}h{elapsed_min % 60:02d}m"
+            else:
+                elapsed_str = f"{elapsed_min}m"
+            line2_parts.append(f"⏱ {elapsed_str}")
+    except Exception:
+        pass
 
     output = "  ".join(line1_parts)
     if line2_parts:

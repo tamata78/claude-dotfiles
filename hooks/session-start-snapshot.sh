@@ -3,6 +3,14 @@
 SNAPSHOT="$PWD/.claude/snapshot.md"
 REVIEW="$PWD/.claude/snapshot-review.md"
 
+# セッション開始時刻を記録（StatusLine経過時間表示用）
+SESSION_ENV_DIR="$HOME/.claude/session-env"
+mkdir -p "$SESSION_ENV_DIR"
+date +%s.%N > "$SESSION_ENV_DIR/current-start" 2>/dev/null || date +%s > "$SESSION_ENV_DIR/current-start"
+
+# 30日以上前のsession-envファイルを自動削除
+find "$SESSION_ENV_DIR" -maxdepth 1 -type f -mtime +30 -not -name "current-start" -delete 2>/dev/null
+
 if [ -f "$SNAPSHOT" ]; then
     export SNAPSHOT_PATH="$SNAPSHOT"
     export REVIEW_PATH="$REVIEW"

@@ -65,6 +65,15 @@ echo "--- コマンド ---"
 mkdir -p "${CLAUDE_DIR}/commands"
 link "commands/review-rules.md"
 link "commands/team.md"
+link "commands/commit.md"
+link "commands/quick-review.md"
+link "commands/debug.md"
+link "commands/morning.md"
+link "commands/release.md"
+link "commands/pr-review.md"
+link "commands/cleanup.md"
+link "commands/rpi.md"
+link "commands/tips.md"
 
 # --- フック ---
 echo "--- フック ---"
@@ -72,6 +81,7 @@ mkdir -p "${CLAUDE_DIR}/hooks"
 link "hooks/pre-compact-save.sh"
 link "hooks/risk-analyzer.py"
 link "hooks/session-start-snapshot.sh"
+link "hooks/operation-logger.py"
 chmod +x "${DOTFILES_DIR}/hooks/pre-compact-save.sh"
 chmod +x "${DOTFILES_DIR}/hooks/session-start-snapshot.sh"
 
@@ -84,10 +94,13 @@ link "scripts/statusline-ring.py"
 echo "--- スキル ---"
 mkdir -p "${CLAUDE_DIR}/skills"
 link_dir "skills/claude-md-improver"
+link_dir "skills/dependency-audit"
 link_dir "skills/dotfiles-sync"
 link_dir "skills/feature-dev"
+link_dir "skills/project-init"
 link_dir "skills/project-snapshot"
 link_dir "skills/prompt-review"
+link_dir "skills/security-audit"
 link_dir "skills/token-audit"
 
 # --- Agent Teams ---
@@ -108,6 +121,14 @@ fi
 ln -s "${DOTFILES_DIR}/git-hooks/pre-commit" "${GLOBAL_HOOKS_DIR}/pre-commit"
 chmod +x "${DOTFILES_DIR}/git-hooks/pre-commit"
 echo "  [link]   ${GLOBAL_HOOKS_DIR}/pre-commit"
+
+# commit-msg hook をリンク
+if [ -L "${GLOBAL_HOOKS_DIR}/commit-msg" ]; then
+  rm "${GLOBAL_HOOKS_DIR}/commit-msg"
+fi
+ln -s "${DOTFILES_DIR}/git-hooks/commit-msg" "${GLOBAL_HOOKS_DIR}/commit-msg"
+chmod +x "${DOTFILES_DIR}/git-hooks/commit-msg"
+echo "  [link]   ${GLOBAL_HOOKS_DIR}/commit-msg"
 
 # core.hooksPath をグローバル設定（全プロジェクトに適用）
 git config --global core.hooksPath "${GLOBAL_HOOKS_DIR}"

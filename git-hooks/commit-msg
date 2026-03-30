@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# commit-msg hook (global): コミットメッセージから不要な行を除去する
+# git config --global core.hooksPath で全プロジェクトに適用
+
+set -euo pipefail
+
+COMMIT_MSG_FILE="$1"
+
+# Co-Authored-By: Claude 行を除去
+# （Claude Code がデフォルトで挿入する行。このリポジトリでは不要）
+sed -i '' '/^Co-Authored-By: Claude/Id' "$COMMIT_MSG_FILE"
+
+# 末尾の空行を整理（除去後に末尾空行が残る場合）
+perl -i -0pe 's/\n+$/\n/' "$COMMIT_MSG_FILE" 2>/dev/null || true
+
+exit 0
