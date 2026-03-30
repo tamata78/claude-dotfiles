@@ -162,6 +162,23 @@ link_home() {
 }
 link_home ".tmux.conf"
 
+# --- TPM (Tmux Plugin Manager) ---
+echo "--- TPM ---"
+TPM_DIR="${HOME}/.tmux/plugins/tpm"
+if [ -d "${TPM_DIR}" ]; then
+  echo "  [skip]   TPM already installed at ${TPM_DIR}"
+else
+  git clone https://github.com/tmux-plugins/tpm "${TPM_DIR}"
+  echo "  [clone]  ${TPM_DIR}"
+fi
+
+# プラグインを自動インストール (tmuxセッションが不要なバッチモード)
+if command -v tmux &>/dev/null && [ -f "${HOME}/.tmux.conf" ]; then
+  echo "  [install] tmux plugins via TPM..."
+  "${TPM_DIR}/bin/install_plugins"
+  echo "  [done]   tmux plugins installed"
+fi
+
 echo ""
 echo "==> インストール完了"
 echo ""

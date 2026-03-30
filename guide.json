@@ -1,0 +1,102 @@
+{
+  "version": "1.0.0",
+  "tokenSavingTip": "グローバル CLAUDE.md は全プロジェクトで毎回読み込まれます。プロジェクト固有の知識は各プロジェクトの CLAUDE.md に移動することでトークンを節約できます。",
+  "configTypes": [
+    {
+      "type": "グローバル CLAUDE.md",
+      "path": "~/.claude/CLAUDE.md",
+      "when": "毎回",
+      "suitable": "行動ルール・通知設定・ユーザー設定",
+      "color": "text-indigo-600"
+    },
+    {
+      "type": "プロジェクト CLAUDE.md",
+      "path": "<project>/CLAUDE.md",
+      "when": "そのプロジェクト時",
+      "suitable": "技術スタック・コマンド・アーキテクチャ",
+      "color": "text-blue-600"
+    },
+    {
+      "type": "カスタムコマンド",
+      "path": "~/.claude/commands/",
+      "when": "呼び出し時のみ",
+      "suitable": "繰り返しの手順書・定型タスク",
+      "color": "text-indigo-600"
+    },
+    {
+      "type": "メモリ",
+      "path": "~/.claude/projects/*/memory/",
+      "when": "自動（Claude管理）",
+      "suitable": "セッション間の記憶・ユーザー情報",
+      "color": "text-emerald-600"
+    },
+    {
+      "type": "スキル",
+      "path": "~/.claude/skills/",
+      "when": "呼び出し時のみ",
+      "suitable": "再利用可能な専門タスク・ワークフロー",
+      "color": "text-purple-600"
+    },
+    {
+      "type": "Hooks",
+      "path": "~/.claude/settings.json",
+      "when": "ツール実行時",
+      "suitable": "リスク分析・権限制御・カスタム検証",
+      "color": "text-orange-600"
+    },
+    {
+      "type": "MCP サーバー",
+      "path": "~/.claude/settings.json → mcpServers",
+      "when": "常時接続",
+      "suitable": "ブラウザ自動化・最新ドキュメント取得・外部ツール連携",
+      "color": "text-teal-600"
+    }
+  ],
+  "organizationSteps": [
+    "「グローバル設定」タブで CLAUDE.md の内容とトークン数を確認する",
+    "プロジェクト固有の内容（技術スタック、コマンド等）を特定する",
+    "該当プロジェクトの CLAUDE.md にその内容を移動する",
+    "グローバル CLAUDE.md から移動した内容を削除する",
+    "「プロジェクト設定」タブで移動後の内容を確認する"
+  ],
+  "commands": [
+    { "cmd": "/commit", "desc": "git差分を分析してコミットメッセージを生成・実行" },
+    { "cmd": "/quick-review", "desc": "staged差分をセキュリティ・品質・パフォーマンス観点でレビュー" },
+    { "cmd": "/debug <エラー>", "desc": "エラーを受け取り、コード調査→WebSearch→原因分析→修正提案" },
+    { "cmd": "/morning", "desc": "全プロジェクトのgit状態確認・前回の続きから今日の計画を提案" },
+    { "cmd": "/release <version>", "desc": "レビュー→テスト→バージョンバンプ→CHANGELOG→commit→pushの一連フロー" },
+    { "cmd": "/pr-review <PR番号>", "desc": "GitHub PRの差分をレビューしてコメントを投稿" },
+    { "cmd": "/cleanup", "desc": "session-env・plans等の古いファイルを整理" },
+    { "cmd": "/rpi <タスク説明>", "desc": "Research→Plan→Implementのフェーズゲート付きワークフロー（大規模機能開発向け）", "isNew": true }
+  ],
+  "skills": [
+    { "name": "/project-init", "desc": "新規プロジェクトに CLAUDE.md・.claude/ を一括セットアップ" },
+    { "name": "/security-audit", "desc": ".env漏洩・依存脆弱性・ハードコード秘密鍵を一括検出" },
+    { "name": "/dependency-audit", "desc": "npm outdated / pip outdated を分析し安全な更新計画を生成" },
+    { "name": "/feature-dev", "desc": "設計→実装→ビルド→テストの開発ワークフロー（大規模時はteam提案）" },
+    { "name": "/project-snapshot", "desc": "開発知見をスナップショットとして保存（次回セッションで自動復元）" },
+    { "name": "/token-audit", "desc": "CLAUDE.md・スキルのトークン消費を監査して削減施策を提案" }
+  ],
+  "hooks": [
+    { "event": "SessionStart", "file": "session-start-snapshot.sh", "desc": "スナップショット読み込み・セッション時刻記録・古いsession-env自動削除（30日）" },
+    { "event": "PreCompact", "file": "pre-compact-save.sh", "desc": "コンテキスト圧縮前にlast-session.mdとして保存" },
+    { "event": "PermissionRequest", "file": "risk-analyzer.py", "desc": "ツール実行のリスクを自動評価して承認判断を支援" },
+    { "event": "PostToolUse", "file": "operation-logger.py", "desc": "Write・Edit・git commit等の操作を~/.claude/session-env/operation-log.jsonlに記録" },
+    { "event": "PostToolUse", "file": "auto-format.py", "desc": "Write/Edit後にprettier・black・gofmt等で自動フォーマット（非同期・フォーマッターが存在する場合のみ）", "isNew": true },
+    { "event": "Stop", "file": "stop-nudge.py", "desc": "ファイル編集後にビルド・テスト未確認の場合、確認を促すナッジを1回送信", "isNew": true },
+    { "event": "PreToolUse", "file": "skill-usage-tracker.py", "desc": "Skill/Agentツールの呼び出しを~/.claude/session-env/skill-usage.jsonlに記録", "isNew": true }
+  ],
+  "mcpServers": [
+    { "name": "context7", "pkg": "@upstash/context7-mcp", "desc": "ライブラリの最新ドキュメントを取得してAPI幻覚を防止。use context7 と指示して利用" },
+    { "name": "playwright", "pkg": "@executeautomation/playwright-mcp-server", "desc": "ブラウザ自動化テスト・スクリーンショット取得・UIのE2E検証" },
+    { "name": "voicevox", "pkg": "@t09tanaka/mcp-simple-voicevox", "desc": "VOICEVOXによる音声通知（ずんだもん）。vvコマンドと連携" }
+  ],
+  "workflowTips": [
+    { "tag": "コンテキスト管理", "tip": "コンテキストが50%に達したら /compact を手動実行。50%超は「agent dumb zone」で応答品質が低下する" },
+    { "tag": "サンドボックス", "tip": "/sandbox コマンドを使うと権限プロンプトを大幅削減できる。探索的タスクや読み取り中心の作業に有効" },
+    { "tag": "RPI", "tip": "/rpi <タスク> でResearch→Plan→Implementのフェーズゲート付き開発フロー。各フェーズでテストが通過してから次へ進む" },
+    { "tag": "スキル使用率", "tip": "~/.claude/session-env/skill-usage.jsonl でどのスキルが使われているか確認できる。使われていないスキルは整理候補" },
+    { "tag": "クロスレビュー", "tip": "重要な設計・実装は別のAI（Codex等）に渡してクロスレビューするとバイアスが減る" },
+    { "tag": "@claude PR", "tip": "GitHub PRで @claude をタグ付けすると Claude Code が自動レビュー・lintルール提案を行う" }
+  ]
+}

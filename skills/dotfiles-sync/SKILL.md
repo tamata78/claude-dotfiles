@@ -135,6 +135,17 @@ grep -EnP '(?i)(password|secret|token|api_key)\s*[:=]\s*\S{6,}|sk-[A-Za-z0-9]{20
    ```
    これ以降は dotfiles 経由で管理される。
 
+4. **manifest.json を更新**
+
+   `$DOTFILES_DIR/manifest.json` の `items` に追加したファイルを記載する。
+   キーは相対パス（例: `commands/foo.md`、`skills/my-skill`）、スコープは `"common"`。
+
+   ```json
+   "commands/foo.md": { "scope": "common", "type": "command" }
+   ```
+
+   `type` の値は種別に応じて: `rule` / `command` / `skill` / `hook` / `script` / `settings` / `git-hook` / `agent-team` / `home-dotfile`
+
 ## ステップ7: git差分の確認・自動コミット・push促進
 
 ```bash
