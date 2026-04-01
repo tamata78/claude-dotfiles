@@ -1,0 +1,55 @@
+#!/bin/bash
+# VOICEVOX通知スクリプト
+# Usage: vv "テキスト" [speaker_id]
+#        vv --default <ID>   デフォルトの声を変更
+# ミュート: ~/.vv_mute ファイルが存在する場合は無音
+
+MUTE_FILE="$HOME/.vv_mute"
+SPEAKER_FILE="$HOME/.vv_speaker"
+
+VOICES=( "2=四国めたん" "3=ずんだもん" "8=春日部つむぎ" "10=雨晴はう" "9=波音リツ" "20=もち子さん" "46=小夜" "54=春歌ナナ" )
+
+# デフォルト声変更モード
+if [ "${1}" = "--default" ]; then
+  NEW_ID="${2}"
+  if [ -z "$NEW_ID" ]; then
+    echo "Usage: vv --default <ID>" >&2
+    exit 1
+  fi
+  echo "$NEW_ID" > "$SPEAKER_FILE"
+  # 名前を探す
+  NAME=""
+  for v in "${VOICES[@]}"; do
+    if [ "${v%%=*}" = "$NEW_ID" ]; then NAME="${v##*=}"; fi
+  done
+  echo "# デフォルトの声を変更しました: ${NEW_ID}${NAME:+=}${NAME}" >&2
+  exit 0
+fi
+
+TEXT="${1}"
+# デフォルトはファイル→スクリプト内フォールバック(3)の順
+DEFAULT_SPEAKER=$(cat "$SPEAKER_FILE" 2>/dev/null || echo "3")
+SPEAKER="${2:-$DEFAULT_SPEAKER}"
+
+[ -z "$TEXT" ] && exit 0
+[ -f "$MUTE_FILE" ] && exit 0
+
+# 声の一覧をコメント表示（現在の声を[]で強調）
+HINTS=""
+for v in "${VOICES[@]}"; do
+  id="${v%%=*}"
+  if [ "$id" = "$SPEAKER" ]; then
+    HINTS="$HINTS [${v}]"
+  else
+    HINTS="$HINTS ${v}"
+  fi
+done
+echo "# 声:${HINTS}  | 変更: vv \"...\" <ID>  | デフォルト変更: vv --default <ID>" >&2
+
+curl -s -X POST "http://localhost:50021/audio_query" \
+  --data-urlencode "text=${TEXT}" \
+  --data-urlencode "speaker=${SPEAKER}" -G | \
+  python3 -c "import json,sys; d=json.load(sys.stdin); d['speedScale']=1.3; print(json.dumps(d))" | \
+  curl -s -X POST "http://localhost:50021/synthesis?speaker=${SPEAKER}" \
+  -H "Content-Type: application/json" -d @- -o /tmp/vv_out.wav && \
+  afplay /tmp/vv_out.wav

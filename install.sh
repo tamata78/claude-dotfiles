@@ -90,6 +90,20 @@ echo "--- スクリプト ---"
 mkdir -p "${CLAUDE_DIR}/scripts"
 link "scripts/statusline-ring.py"
 
+# --- VOICEVOXコマンド ---
+echo "--- VOICEVOXコマンド ---"
+VV_SRC="${DOTFILES_DIR}/scripts/vv"
+VV_DST="/usr/local/bin/vv"
+if [ -e "${VV_DST}" ] && [ ! -L "${VV_DST}" ]; then
+  echo "  [backup] ${VV_DST} -> ${VV_DST}.bak"
+  mv "${VV_DST}" "${VV_DST}.bak"
+elif [ -L "${VV_DST}" ]; then
+  rm "${VV_DST}"
+fi
+ln -s "${VV_SRC}" "${VV_DST}"
+chmod +x "${VV_SRC}"
+echo "  [link]   ${VV_DST}"
+
 # --- スキル ---
 echo "--- スキル ---"
 mkdir -p "${CLAUDE_DIR}/skills"

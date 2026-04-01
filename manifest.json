@@ -24,6 +24,7 @@
     "hooks/skill-usage-tracker.py": { "scope": "common", "type": "hook" },
     "hooks/stop-nudge.py": { "scope": "common", "type": "hook" },
     "scripts/statusline-ring.py": { "scope": "common", "type": "script" },
+    "scripts/vv": { "scope": "common", "type": "script" },
     "skills/claude-md-improver": { "scope": "common", "type": "skill" },
     "skills/dependency-audit": { "scope": "common", "type": "skill" },
     "skills/dotfiles-sync": { "scope": "common", "type": "skill" },
