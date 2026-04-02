@@ -110,6 +110,23 @@ match_exclude() {
   return 1
 }
 
+# ステージ内容のフィルター（デフォルトは passthrough）
+# pre-commit.local で上書きすることでプロジェクト固有の除外ロジックを追加できる
+filter_content() {
+  cat
+}
+
+# ============================================================
+# 環境固有の設定を読み込む（git管理外・マシン固有）
+# このスクリプトと同じディレクトリに pre-commit.local があれば source する
+# 配列への追記・関数の上書きが可能
+# ============================================================
+PRECOMMIT_LOCAL="${BASH_SOURCE[0]}.local"
+if [ -f "$PRECOMMIT_LOCAL" ]; then
+  # shellcheck source=/dev/null
+  source "$PRECOMMIT_LOCAL"
+fi
+
 # grep ラッパー: パターンインデックスに応じて -i を付与
 grep_pattern() {
   local idx="$1"
@@ -158,10 +175,14 @@ check_staged_files() {
     local staged_content
     staged_content=$(git show ":${file}" 2>/dev/null) || continue
 
+    # filter_content でモックブロック等を除去（pre-commit.local で上書き可能）
+    local filtered_content
+    filtered_content=$(echo "$staged_content" | filter_content || true)
+
     # --- ローカルパスチェック ---
     if ! match_exclude "$file" "${EXCLUDE_PATH_PATTERNS[@]}"; then
       local path_matches
-      path_matches=$(echo "$staged_content" | grep -En "$LOCAL_PATH_PATTERN" 2>/dev/null | grep -v "^Binary" || true)
+      path_matches=$(echo "$filtered_content" | grep -En "$LOCAL_PATH_PATTERN" 2>/dev/null | grep -v "^Binary" || true)
       if [ -n "$path_matches" ]; then
         echo "❌ [pre-commit] ローカル固有パスが検出されました:" >&2
         echo "  ファイル: $file" >&2
@@ -177,7 +198,7 @@ check_staged_files() {
       local idx=0
       for pattern in "${SECRET_KEY_PATTERNS[@]}"; do
         local secret_matches
-        secret_matches=$(echo "$staged_content" | grep_pattern_stdin "$idx" "$pattern" | grep -v "^Binary" || true)
+        secret_matches=$(echo "$filtered_content" | grep_pattern_stdin "$idx" "$pattern" | grep -v "^Binary" || true)
         if [ -n "$secret_matches" ]; then
           echo "❌ [pre-commit] 秘匿情報が検出されました:" >&2
           echo "  ファイル: $file" >&2
@@ -196,7 +217,7 @@ check_staged_files() {
     if ! match_exclude "$file" "${EXCLUDE_SECRET_PATTERNS[@]}"; then
       for pattern in "${PII_PATTERNS[@]}"; do
         local pii_matches
-        pii_matches=$(echo "$staged_content" | grep -En "$pattern" 2>/dev/null | grep -v "^Binary" || true)
+        pii_matches=$(echo "$filtered_content" | grep -En "$pattern" 2>/dev/null | grep -v "^Binary" || true)
         if [ -n "$pii_matches" ]; then
           echo "⚠️  [pre-commit] 個人情報の可能性がある記述が見つかりました（要確認）:" >&2
           echo "  ファイル: $file" >&2
