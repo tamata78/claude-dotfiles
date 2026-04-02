@@ -96,11 +96,11 @@ VV_SRC="${DOTFILES_DIR}/scripts/vv"
 VV_DST="/usr/local/bin/vv"
 if [ -e "${VV_DST}" ] && [ ! -L "${VV_DST}" ]; then
   echo "  [backup] ${VV_DST} -> ${VV_DST}.bak"
-  mv "${VV_DST}" "${VV_DST}.bak"
+  sudo mv "${VV_DST}" "${VV_DST}.bak"
 elif [ -L "${VV_DST}" ]; then
-  rm "${VV_DST}"
+  sudo rm "${VV_DST}"
 fi
-ln -s "${VV_SRC}" "${VV_DST}"
+sudo ln -s "${VV_SRC}" "${VV_DST}"
 chmod +x "${VV_SRC}"
 echo "  [link]   ${VV_DST}"
 

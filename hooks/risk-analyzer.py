@@ -5,6 +5,10 @@ Claude Code PermissionRequest hook - リスクレベルと説明を表示する
 import json
 import sys
 import re
+import os
+from datetime import datetime, timezone, timedelta
+
+JST = timezone(timedelta(hours=9))
 
 
 def get_risk_info(tool_name, tool_input):
@@ -27,6 +31,10 @@ def get_risk_info(tool_name, tool_input):
     elif tool_name == "Agent":
         agent_type = tool_input.get("subagent_type", "unknown")
         return "🟡 中リスク", f"サブエージェントを起動: {agent_type}"
+    elif tool_name in ("Read", "Glob", "Grep", "ToolSearch", "TaskGet", "TaskList", "TaskOutput"):
+        return "🟢 低リスク", f"ツール実行: {tool_name}"
+    elif tool_name in ("ExitPlanMode", "ExitWorktree", "AskUserQuestion"):
+        return "🟢 低リスク", f"ツール実行: {tool_name}"
     else:
         return "🟡 中リスク", f"ツール実行: {tool_name}"
 
@@ -76,7 +84,7 @@ def analyze_bash_risk(command):
 
     # 低リスクパターン
     low_risk = [
-        (r"\bgit\s+(status|diff|log|show|branch|stash\s+list|remote)\b", "Gitの状態を確認"),
+        (r"\bgit\s+(status|diff|log|show|branch|stash\s+list|remote|config)\b", "Gitの状態を確認"),
         (r"\b(ls|ll|pwd|echo|cat|head|tail|wc|file)\b", "ファイル/ディレクトリを参照"),
         (r"\b(grep|rg|find|fzf|awk|sed)\b", "ファイルを検索/フィルタ"),
         (r"\bnpm\s+(list|audit|outdated|info)\b", "npmパッケージ情報を確認"),
@@ -124,6 +132,34 @@ def format_command_preview(tool_name, tool_input):
     return ""
 
 
+def log_permission_request(tool_name, tool_input, risk_level, description, decision):
+    """PermissionRequest の発生をログに記録する"""
+    log_dir = os.path.expanduser("~/.claude/session-env")
+    os.makedirs(log_dir, exist_ok=True)
+    log_file = os.path.join(log_dir, "permission-requests.jsonl")
+
+    entry = {
+        "ts": datetime.now(JST).isoformat(),
+        "tool": tool_name,
+        "risk": risk_level,
+        "description": description,
+        "decision": decision,
+    }
+
+    if tool_name == "Bash":
+        entry["command"] = tool_input.get("command", "")[:200]
+    elif tool_name in ("Edit", "Write"):
+        entry["file_path"] = tool_input.get("file_path", "")
+    elif tool_name == "Agent":
+        entry["subagent_type"] = tool_input.get("subagent_type", "")
+
+    try:
+        with open(log_file, "a") as f:
+            f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+    except Exception:
+        pass
+
+
 def main():
     try:
         raw = sys.stdin.read()
@@ -143,11 +179,15 @@ def main():
         reason = "\n".join(lines)
         print(reason, file=sys.stderr)
 
+        decision = "allow" if risk_level.startswith("🟢") else "ask"
         result = {
-            "permissionDecision": "ask",
+            "permissionDecision": decision,
             "reason": reason,
         }
         print(json.dumps(result, ensure_ascii=False))
+
+        # ログ記録: PermissionRequest が発生したコマンドを保存
+        log_permission_request(tool_name, tool_input, risk_level, description, decision)
 
     except Exception:
         # エラー時はそのまま通常の承認フローへ
