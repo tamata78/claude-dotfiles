@@ -182,7 +182,7 @@ check_staged_files() {
     # --- ローカルパスチェック ---
     if ! match_exclude "$file" "${EXCLUDE_PATH_PATTERNS[@]}"; then
       local path_matches
-      path_matches=$(echo "$filtered_content" | grep -En "$LOCAL_PATH_PATTERN" 2>/dev/null | grep -v "^Binary" || true)
+      path_matches=$(echo "$filtered_content" | grep -En "$LOCAL_PATH_PATTERN" 2>/dev/null | grep -v "^Binary" | grep -v '/Users/username' || true)
       if [ -n "$path_matches" ]; then
         echo "❌ [pre-commit] ローカル固有パスが検出されました:" >&2
         echo "  ファイル: $file" >&2
