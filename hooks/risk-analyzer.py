@@ -3,9 +3,10 @@
 Claude Code PermissionRequest hook - リスクレベルと説明を表示する
 """
 import json
-import sys
-import re
 import os
+import re
+import subprocess
+import sys
 from datetime import datetime, timezone, timedelta
 
 JST = timezone(timedelta(hours=9))
@@ -192,6 +193,15 @@ def main():
     except Exception:
         # エラー時はそのまま通常の承認フローへ
         sys.exit(0)
+    finally:
+        # Hook使用ログ記録（非同期）
+        try:
+            subprocess.Popen(
+                ["python3", os.path.expanduser("~/.claude/hooks/usage-log.py"), "Hook", os.path.basename(__file__)],
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            )
+        except Exception:
+            pass
 
 
 if __name__ == "__main__":

@@ -8,8 +8,9 @@ operation-log.jsonl を参照し、直近5分以内に：
 場合のみ、セッションごとに1回だけブロックして確認を促す。
 """
 import json
-import sys
 import os
+import subprocess
+import sys
 from datetime import datetime, timezone, timedelta
 
 JST = timezone(timedelta(hours=9))
@@ -109,4 +110,14 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    finally:
+        # Hook使用ログ記録（非同期）
+        try:
+            subprocess.Popen(
+                ["python3", os.path.expanduser("~/.claude/hooks/usage-log.py"), "Hook", os.path.basename(__file__)],
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            )
+        except Exception:
+            pass

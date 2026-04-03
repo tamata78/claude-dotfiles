@@ -53,3 +53,6 @@ print(json.dumps({
 }))
 "
 fi
+
+# Hook使用ログ記録
+python3 "$HOME/.claude/hooks/usage-log.py" Hook session-start-snapshot.sh &

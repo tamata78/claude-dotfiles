@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "tokenSavingTip": "グローバル CLAUDE.md は全プロジェクトで毎回読み込まれます。プロジェクト固有の知識は各プロジェクトの CLAUDE.md に移動することでトークンを節約できます。",
   "configTypes": [
     {
@@ -67,7 +67,10 @@
     { "cmd": "/release <version>", "desc": "レビュー→テスト→バージョンバンプ→CHANGELOG→commit→pushの一連フロー" },
     { "cmd": "/pr-review <PR番号>", "desc": "GitHub PRの差分をレビューしてコメントを投稿" },
     { "cmd": "/cleanup", "desc": "session-env・plans等の古いファイルを整理" },
-    { "cmd": "/rpi <タスク説明>", "desc": "Research→Plan→Implementのフェーズゲート付きワークフロー（大規模機能開発向け）", "isNew": true }
+    { "cmd": "/rpi <タスク説明>", "desc": "Research→Plan→Implementのフェーズゲート付きワークフロー（大規模機能開発向け）", "isNew": true },
+    { "cmd": "/review-rules", "desc": "ルール・スキルの棚卸しレポート作成。重複・矛盾・肥大化を検出し改善提案", "isNew": true },
+    { "cmd": "/tips", "desc": "Claude Code・スキル開発に関する品質向上のヒント集（ルールではなく推奨事項）", "isNew": true },
+    { "cmd": "/team", "desc": "Claude Code Agent Teams ヘルプ", "isNew": true }
   ],
   "skills": [
     { "name": "/project-init", "desc": "新規プロジェクトに CLAUDE.md・.claude/ を一括セットアップ" },
@@ -75,7 +78,10 @@
     { "name": "/dependency-audit", "desc": "npm outdated / pip outdated を分析し安全な更新計画を生成" },
     { "name": "/feature-dev", "desc": "設計→実装→ビルド→テストの開発ワークフロー（大規模時はteam提案）" },
     { "name": "/project-snapshot", "desc": "開発知見をスナップショットとして保存（次回セッションで自動復元）" },
-    { "name": "/token-audit", "desc": "CLAUDE.md・スキルのトークン消費を監査して削減施策を提案" }
+    { "name": "/token-audit", "desc": "CLAUDE.md・スキルのトークン消費を監査して削減施策を提案" },
+    { "name": "/claude-md-improver", "desc": "CLAUDE.mdを分析しベストプラクティスに基づいた改善提案と修正を行う", "isNew": true },
+    { "name": "/dotfiles-sync", "desc": "claude-dotfilesリポジトリに共通設定を同期する", "isNew": true },
+    { "name": "/skill-tips", "desc": "ユーザーの発言に関連する便利なスキルをさりげなく紹介する", "isNew": true }
   ],
   "hooks": [
     { "event": "SessionStart", "file": "session-start-snapshot.sh", "desc": "スナップショット読み込み・セッション時刻記録・古いsession-env自動削除（30日）" },

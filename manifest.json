@@ -17,6 +17,8 @@
     "commands/team.md": { "scope": "common", "type": "command" },
     "commands/tips.md": { "scope": "common", "type": "command" },
     "hooks/auto-format.py": { "scope": "common", "type": "hook" },
+    "hooks/command-usage-tracker.py": { "scope": "common", "type": "hook" },
+    "hooks/usage-log.py": { "scope": "common", "type": "script" },
     "hooks/operation-logger.py": { "scope": "common", "type": "hook" },
     "hooks/pre-compact-save.sh": { "scope": "common", "type": "hook" },
     "hooks/risk-analyzer.py": { "scope": "common", "type": "hook" },

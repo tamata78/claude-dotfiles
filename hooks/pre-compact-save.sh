@@ -88,4 +88,7 @@ $(echo "$RECENT_ASSISTANT" | while IFS= read -r line; do
 done)
 EOF
 
+# Hook使用ログ記録
+python3 "$HOME/.claude/hooks/usage-log.py" Hook pre-compact-save.sh &
+
 exit 0
