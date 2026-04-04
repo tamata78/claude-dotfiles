@@ -92,17 +92,31 @@ link "scripts/statusline-ring.py"
 
 # --- VOICEVOXコマンド ---
 echo "--- VOICEVOXコマンド ---"
-VV_SRC="${DOTFILES_DIR}/scripts/vv"
-VV_DST="/usr/local/bin/vv"
-if [ -e "${VV_DST}" ] && [ ! -L "${VV_DST}" ]; then
-  echo "  [backup] ${VV_DST} -> ${VV_DST}.bak"
-  sudo mv "${VV_DST}" "${VV_DST}.bak"
-elif [ -L "${VV_DST}" ]; then
-  sudo rm "${VV_DST}"
+mkdir -p "${HOME}/.local/bin"
+for cmd in vv vv-mute vv-voice; do
+  SRC="${DOTFILES_DIR}/scripts/${cmd}"
+  DST="${HOME}/.local/bin/${cmd}"
+  chmod +x "${SRC}"
+  if [ -L "${DST}" ]; then
+    rm "${DST}"
+  elif [ -e "${DST}" ]; then
+    mv "${DST}" "${DST}.bak"
+  fi
+  ln -s "${SRC}" "${DST}"
+  echo "  [link]   ${DST}"
+done
+
+# ~/.local/bin を PATH に追加（未追加の場合のみ）
+SHELL_RC="${HOME}/.zshrc"
+LOCAL_BIN_LINE='export PATH="$HOME/.local/bin:$PATH"'
+if ! grep -qF "${LOCAL_BIN_LINE}" "${SHELL_RC}" 2>/dev/null; then
+  echo "" >> "${SHELL_RC}"
+  echo "# added by claude-dotfiles install.sh" >> "${SHELL_RC}"
+  echo "${LOCAL_BIN_LINE}" >> "${SHELL_RC}"
+  echo "  [update] ${SHELL_RC} に ~/.local/bin を PATH 追加"
+else
+  echo "  [skip]   ~/.local/bin は既に PATH に設定済み"
 fi
-sudo ln -s "${VV_SRC}" "${VV_DST}"
-chmod +x "${VV_SRC}"
-echo "  [link]   ${VV_DST}"
 
 # --- スキル ---
 echo "--- スキル ---"
@@ -113,7 +127,6 @@ link_dir "skills/dotfiles-sync"
 link_dir "skills/feature-dev"
 link_dir "skills/project-init"
 link_dir "skills/project-snapshot"
-link_dir "skills/prompt-review"
 link_dir "skills/security-audit"
 link_dir "skills/token-audit"
 
@@ -189,7 +202,7 @@ fi
 # プラグインを自動インストール (tmuxセッションが不要なバッチモード)
 if command -v tmux &>/dev/null && [ -f "${HOME}/.tmux.conf" ]; then
   echo "  [install] tmux plugins via TPM..."
-  "${TPM_DIR}/bin/install_plugins"
+  TMUX_PLUGIN_MANAGER_PATH="${HOME}/.tmux/plugins/" "${TPM_DIR}/bin/install_plugins"
   echo "  [done]   tmux plugins installed"
 fi
 

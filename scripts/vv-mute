@@ -1,0 +1,13 @@
+#!/bin/bash
+# VOICEVOX ミュートトグル
+# Usage: vv-mute
+
+MUTE_FILE="$HOME/.vv_mute"
+
+if [ -f "$MUTE_FILE" ]; then
+  rm "$MUTE_FILE"
+  echo "VOICEVOX: ミュート解除"
+else
+  touch "$MUTE_FILE"
+  echo "VOICEVOX: ミュート中"
+fi

@@ -1,0 +1,33 @@
+#!/bin/bash
+# VOICEVOX voice switcher for Claude Code CLAUDE.md
+# Usage: vv-voice [zundamon|metan|tsumugi]
+
+CLAUDE_MD="$HOME/.claude/CLAUDE.md"
+
+set_speaker() {
+  local name=$1
+  local id=$2
+  sed -i '' "s/speaker=[0-9]*(.*)/speaker=${id}(${name})/" "$CLAUDE_MD"
+  echo "VOICEVOXの声を ${name} (ID: ${id}) に変更しました"
+}
+
+case "$1" in
+  zundamon|ずんだもん)
+    set_speaker "ずんだもんノーマル" 3
+    ;;
+  metan|めたん)
+    set_speaker "四国めたんノーマル" 2
+    ;;
+  tsumugi|つむぎ)
+    set_speaker "春日部つむぎノーマル" 8
+    ;;
+  *)
+    echo "Usage: vv-voice [zundamon|metan|tsumugi]"
+    echo ""
+    echo "利用可能な声:"
+    echo "  zundamon  - ずんだもん ノーマル (ID: 3)"
+    echo "  metan     - 四国めたん ノーマル (ID: 2)"
+    echo "  tsumugi   - 春日部つむぎ ノーマル (ID: 8)"
+    exit 1
+    ;;
+esac

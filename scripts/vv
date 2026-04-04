@@ -2,14 +2,61 @@
 # VOICEVOX通知スクリプト
 # Usage: vv "テキスト" [speaker_id]
 #        vv --default <ID>   デフォルトの声を変更
+#        vv --config          接続設定を表示
 # ミュート: ~/.vv_mute ファイルが存在する場合は無音
+#
+# 設定ファイル: ~/.vv_config（なければデフォルト値を使用）
+#   VV_ENDPOINTS="http://localhost:50021,http://localhost:50032"
+#   VV_SPEED=1.3
 
 MUTE_FILE="$HOME/.vv_mute"
 SPEAKER_FILE="$HOME/.vv_speaker"
+CONFIG_FILE="$HOME/.vv_config"
+
+# デフォルト値
+DEFAULT_ENDPOINTS="http://localhost:50021"
+DEFAULT_SPEED="1.3"
+
+# 設定ファイル読み込み
+if [ -f "$CONFIG_FILE" ]; then
+  # shellcheck source=/dev/null
+  source "$CONFIG_FILE"
+fi
+ENDPOINTS="${VV_ENDPOINTS:-$DEFAULT_ENDPOINTS}"
+SPEED="${VV_SPEED:-$DEFAULT_SPEED}"
 
 VOICES=( "2=四国めたん" "3=ずんだもん" "8=春日部つむぎ" "10=雨晴はう" "9=波音リツ" "20=もち子さん" "46=小夜" "54=春歌ナナ" )
 
-# デフォルト声変更モード
+# --- ヘルスチェック: 利用可能なエンドポイントを探す ---
+find_endpoint() {
+  IFS=',' read -ra EP_LIST <<< "$ENDPOINTS"
+  for ep in "${EP_LIST[@]}"; do
+    ep="$(echo "$ep" | xargs)"  # trim spaces
+    if curl -s --max-time 1 "${ep}/version" >/dev/null 2>&1; then
+      echo "$ep"
+      return 0
+    fi
+  done
+  return 1
+}
+
+# --- --config: 設定表示 ---
+if [ "${1}" = "--config" ]; then
+  echo "# vv 設定"
+  echo "  エンドポイント: ${ENDPOINTS}"
+  echo "  速度: ${SPEED}"
+  echo "  設定ファイル: ${CONFIG_FILE}"
+  EP=$(find_endpoint)
+  if [ $? -eq 0 ]; then
+    VER=$(curl -s --max-time 2 "${EP}/version" 2>/dev/null)
+    echo "  接続先: ${EP} (version: ${VER})"
+  else
+    echo "  接続先: 接続不可"
+  fi
+  exit 0
+fi
+
+# --- --default: デフォルト声変更 ---
 if [ "${1}" = "--default" ]; then
   NEW_ID="${2}"
   if [ -z "$NEW_ID" ]; then
@@ -17,7 +64,6 @@ if [ "${1}" = "--default" ]; then
     exit 1
   fi
   echo "$NEW_ID" > "$SPEAKER_FILE"
-  # 名前を探す
   NAME=""
   for v in "${VOICES[@]}"; do
     if [ "${v%%=*}" = "$NEW_ID" ]; then NAME="${v##*=}"; fi
@@ -27,7 +73,6 @@ if [ "${1}" = "--default" ]; then
 fi
 
 TEXT="${1}"
-# デフォルトはファイル→スクリプト内フォールバック(3)の順
 DEFAULT_SPEAKER=$(cat "$SPEAKER_FILE" 2>/dev/null || echo "3")
 SPEAKER="${2:-$DEFAULT_SPEAKER}"
 
@@ -46,10 +91,25 @@ for v in "${VOICES[@]}"; do
 done
 echo "# 声:${HINTS}  | 変更: vv \"...\" <ID>  | デフォルト変更: vv --default <ID>" >&2
 
-curl -s -X POST "http://localhost:50021/audio_query" \
+# --- エンドポイント検出 ---
+BASE_URL=$(find_endpoint)
+if [ $? -ne 0 ]; then
+  echo "# [vv] VOICEVOX エンジンに接続できません (${ENDPOINTS})" >&2
+  exit 1
+fi
+
+# --- 音声合成 ---
+QUERY=$(curl -s --max-time 5 -X POST "${BASE_URL}/audio_query" \
   --data-urlencode "text=${TEXT}" \
-  --data-urlencode "speaker=${SPEAKER}" -G | \
-  python3 -c "import json,sys; d=json.load(sys.stdin); d['speedScale']=1.3; print(json.dumps(d))" | \
-  curl -s -X POST "http://localhost:50021/synthesis?speaker=${SPEAKER}" \
-  -H "Content-Type: application/json" -d @- -o /tmp/vv_out.wav && \
+  --data-urlencode "speaker=${SPEAKER}" -G 2>/dev/null)
+
+if [ -z "$QUERY" ] || echo "$QUERY" | grep -q '"detail"'; then
+  echo "# [vv] audio_query 失敗 (${BASE_URL})" >&2
+  exit 1
+fi
+
+echo "$QUERY" | \
+  python3 -c "import json,sys; d=json.load(sys.stdin); d['speedScale']=${SPEED}; print(json.dumps(d))" | \
+  curl -s --max-time 10 -X POST "${BASE_URL}/synthesis?speaker=${SPEAKER}" \
+  -H "Content-Type: application/json" -d @- -o /tmp/vv_out.wav 2>/dev/null && \
   afplay /tmp/vv_out.wav

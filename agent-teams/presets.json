@@ -1,7 +1,12 @@
 {
   "simple": {
-    "description": "設計・実装 + Devil's Advocate (2体) - 日常開発向けデフォルト",
+    "description": "Architect + 実装 + Devil's Advocate (3体) - 日常開発向けデフォルト",
     "roles": [
+      {
+        "name": "architect",
+        "prompt_file": "architect.md",
+        "description": "全体設計・アーキテクチャの観点からレビューし、設計の整合性を担保する"
+      },
       {
         "name": "implementer",
         "prompt_file": "implementer.md",

@@ -1,8 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(vv:*)",
-      "Bash(vv-mute:*)",
+      "Bash(~/.local/bin/vv:*)",
+      "Bash(~/.local/bin/vv-mute:*)",
       "WebSearch",
       "WebFetch",
       "Bash(gh api *)",
