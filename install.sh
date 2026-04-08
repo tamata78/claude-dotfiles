@@ -82,6 +82,7 @@ link "hooks/pre-compact-save.sh"
 link "hooks/risk-analyzer.py"
 link "hooks/session-start-snapshot.sh"
 link "hooks/operation-logger.py"
+link "hooks/post-risk-logger.py"
 chmod +x "${DOTFILES_DIR}/hooks/pre-compact-save.sh"
 chmod +x "${DOTFILES_DIR}/hooks/session-start-snapshot.sh"
 

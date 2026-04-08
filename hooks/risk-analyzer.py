@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Claude Code PermissionRequest hook - リスクレベルと説明を表示する
+Claude Code PreToolUse hook - リスクレベルに応じて自動承認/承認要求を判定する
 """
 import json
 import os
@@ -32,9 +32,14 @@ def get_risk_info(tool_name, tool_input):
     elif tool_name == "Agent":
         agent_type = tool_input.get("subagent_type", "unknown")
         return "🟡 中リスク", f"サブエージェントを起動: {agent_type}"
-    elif tool_name in ("Read", "Glob", "Grep", "ToolSearch", "TaskGet", "TaskList", "TaskOutput"):
+    elif tool_name == "Read":
+        file_path = tool_input.get("file_path", "")
+        return analyze_read_risk(file_path)
+    elif tool_name in ("Glob", "Grep", "ToolSearch", "TaskGet", "TaskList", "TaskOutput",
+                        "TaskCreate", "TaskUpdate", "TaskStop"):
         return "🟢 低リスク", f"ツール実行: {tool_name}"
-    elif tool_name in ("ExitPlanMode", "ExitWorktree", "AskUserQuestion"):
+    elif tool_name in ("ExitPlanMode", "EnterPlanMode", "ExitWorktree", "EnterWorktree",
+                        "AskUserQuestion", "NotebookEdit"):
         return "🟢 低リスク", f"ツール実行: {tool_name}"
     else:
         return "🟡 中リスク", f"ツール実行: {tool_name}"
@@ -62,6 +67,29 @@ def analyze_bash_risk(command):
         if re.search(pattern, cmd, re.IGNORECASE):
             return "🔴 高リスク", desc
 
+    # 低リスクパターン（中リスクより先に判定 — 安全なサブセットを先に除外）
+    low_risk = [
+        (r"\bgit\s+(status|diff|log|show|branch|stash\s+list|remote|config)\b", "Gitの状態を確認"),
+        (r"\b(ls|ll|pwd|echo|cat|head|tail|wc|file)\b", "ファイル/ディレクトリを参照"),
+        (r"\b(grep|rg|find|fzf|awk|sed)\b", "ファイルを検索/フィルタ"),
+        (r"\bnpm\s+(list|audit|outdated|info)\b", "npmパッケージ情報を確認"),
+        (r"\b(which|type|env|printenv|whoami|id)\b", "環境情報を確認"),
+        (r"\b\S+\s+--version\b|\b\S+\s+-v\b", "バージョンを確認"),
+        (r"\bvv\b", "音声通知を送信"),
+        (r"\bopen\b", "ファイル/URLを開く"),
+        (r"\bcurl\s+.*(?:localhost|127\.0\.0\.1)", "ローカルHTTPリクエスト"),
+        (r"\bchmod\s+\+x\b", "実行権限を付与"),
+        (r"\./gradlew\b|\bgradlew\b", "Gradleビルドを実行"),
+        (r"\bln\s+(?:-[a-z]*\s+)*\S", "シンボリックリンクを作成"),
+        (r"\bjq\b", "JSON処理"),
+        (r"\bxargs\b", "パイプ処理を実行"),
+        (r"\bdiff\b", "差分を確認"),
+        (r"\bsort\b|\buniq\b|\btr\b|\bcut\b", "テキスト処理"),
+    ]
+    for pattern, desc in low_risk:
+        if re.search(pattern, cmd, re.IGNORECASE):
+            return "🟢 低リスク", desc
+
     # 中リスクパターン
     medium_risk = [
         (r"\bgit\s+(add|commit)\b", "Gitで変更をステージ/コミット"),
@@ -83,22 +111,16 @@ def analyze_bash_risk(command):
         if re.search(pattern, cmd, re.IGNORECASE):
             return "🟡 中リスク", desc
 
-    # 低リスクパターン
-    low_risk = [
-        (r"\bgit\s+(status|diff|log|show|branch|stash\s+list|remote|config)\b", "Gitの状態を確認"),
-        (r"\b(ls|ll|pwd|echo|cat|head|tail|wc|file)\b", "ファイル/ディレクトリを参照"),
-        (r"\b(grep|rg|find|fzf|awk|sed)\b", "ファイルを検索/フィルタ"),
-        (r"\bnpm\s+(list|audit|outdated|info)\b", "npmパッケージ情報を確認"),
-        (r"\b(which|type|env|printenv|whoami|id)\b", "環境情報を確認"),
-        (r"\b\S+\s+--version\b|\b\S+\s+-v\b", "バージョンを確認"),
-        (r"\bvv\b", "音声通知を送信"),
-        (r"\bopen\b", "ファイル/URLを開く"),
-    ]
-    for pattern, desc in low_risk:
-        if re.search(pattern, cmd, re.IGNORECASE):
-            return "🟢 低リスク", desc
-
     return "🟡 中リスク", "コマンドを実行"
+
+
+def analyze_read_risk(file_path):
+    """Read ツールのリスク判定 - 機密ファイルは承認要求"""
+    name = file_path.split("/")[-1] if "/" in file_path else file_path
+    sensitive_patterns = [".env", "secrets", "credentials", "id_rsa", "private_key", "token", ".pem", ".key"]
+    if any(p in name.lower() for p in sensitive_patterns):
+        return "🟡 中リスク", f"機密ファイルを読み取り: {name}"
+    return "🟢 低リスク", f"ファイルを読み取り: {name}"
 
 
 def analyze_file_risk(action, file_path):
@@ -137,14 +159,17 @@ def log_permission_request(tool_name, tool_input, risk_level, description, decis
     """PermissionRequest の発生をログに記録する"""
     log_dir = os.path.expanduser("~/.claude/session-env")
     os.makedirs(log_dir, exist_ok=True)
-    log_file = os.path.join(log_dir, "permission-requests.jsonl")
+    now = datetime.now(JST)
+    log_file = os.path.join(log_dir, f"permission-requests-{now.strftime('%Y-%m')}.jsonl")
 
     entry = {
-        "ts": datetime.now(JST).isoformat(),
+        "ts": now.isoformat(),
         "tool": tool_name,
         "risk": risk_level,
         "description": description,
         "decision": decision,
+        "session_id": os.environ.get("CLAUDE_SESSION_ID", "unknown"),
+        "project": os.getcwd(),
     }
 
     if tool_name == "Bash":
@@ -182,12 +207,15 @@ def main():
 
         decision = "allow" if risk_level.startswith("🟢") else "ask"
         result = {
-            "permissionDecision": decision,
-            "reason": reason,
+            "hookSpecificOutput": {
+                "hookEventName": "PreToolUse",
+                "permissionDecision": decision,
+                "permissionDecisionReason": reason,
+            }
         }
         print(json.dumps(result, ensure_ascii=False))
 
-        # ログ記録: PermissionRequest が発生したコマンドを保存
+        # ログ記録: PreToolUse の判定結果を保存
         log_permission_request(tool_name, tool_input, risk_level, description, decision)
 
     except Exception:

@@ -68,7 +68,7 @@
       "Bash(chmod -R 777*)"
     ]
   },
-  "model": "opusplan",
+  "model": "opus",
   "hooks": {
     "SessionStart": [
       {
@@ -88,17 +88,6 @@
           {
             "type": "command",
             "command": "$HOME/.claude/hooks/pre-compact-save.sh"
-          }
-        ]
-      }
-    ],
-    "PermissionRequest": [
-      {
-        "matcher": ".*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 $HOME/.claude/hooks/risk-analyzer.py"
           }
         ]
       }
@@ -132,6 +121,11 @@
             "type": "command",
             "command": "python3 $HOME/.claude/hooks/skill-usage-tracker.py",
             "async": true
+          },
+          {
+            "type": "command",
+            "command": "python3 $HOME/.claude/hooks/risk-analyzer.py",
+            "statusMessage": "リスク判定中..."
           }
         ]
       }
@@ -143,6 +137,16 @@
           {
             "type": "command",
             "command": "python3 $HOME/.claude/hooks/operation-logger.py"
+          }
+        ]
+      },
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 $HOME/.claude/hooks/post-risk-logger.py",
+            "async": true
           }
         ]
       },
@@ -184,11 +188,17 @@
     },
     "context7": {
       "command": "npx",
-      "args": ["-y", "@upstash/context7-mcp"]
+      "args": [
+        "-y",
+        "@upstash/context7-mcp"
+      ]
     },
     "playwright": {
       "command": "npx",
-      "args": ["-y", "@executeautomation/playwright-mcp-server"]
+      "args": [
+        "-y",
+        "@executeautomation/playwright-mcp-server"
+      ]
     }
   }
 }
