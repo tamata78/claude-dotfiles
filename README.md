@@ -12,8 +12,8 @@ bash install.sh  # シンボリックリンクを作成（冪等）
 
 | ディレクトリ | 内容 |
 |---|---|
-| `skills/` | カスタムスキル（feature-dev, token-audit, project-snapshot 等） |
-| `commands/` | カスタムスラッシュコマンド |
+| `skills/` | カスタムスキル（dotfiles-sync, feature-dev, pr-review, project-snapshot, token-audit） |
+| `commands/` | カスタムスラッシュコマンド（cleanup, commit, debug, dependency-audit, morning, pr-review, project-init, quick-review, release, review-rules, rpi, security-audit, skill-tips, team, tips） |
 | `hooks/` | PreCompact・PermissionRequest フック |
 | `CLAUDE.md` | 全プロジェクト共通のグローバルルール |
 
