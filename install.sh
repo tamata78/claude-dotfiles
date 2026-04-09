@@ -74,6 +74,10 @@ link "commands/pr-review.md"
 link "commands/cleanup.md"
 link "commands/rpi.md"
 link "commands/tips.md"
+link "commands/dependency-audit.md"
+link "commands/project-init.md"
+link "commands/security-audit.md"
+link "commands/skill-tips.md"
 
 # --- フック ---
 echo "--- フック ---"

@@ -42,8 +42,7 @@
       "Bash(npm install *)",
       "Bash(npm init *)",
       "Bash(npx tsc *)",
-      "Bash(npx @t09tanaka/mcp-simple-voicevox*)",
-      "Bash(claude-team:*)",
+"Bash(claude-team:*)",
       "Bash(mgrep *)",
       "Bash(cd * && npm *)",
       "Bash(cd * && npx tsc *)",
@@ -167,7 +166,7 @@
     "command": "$HOME/.claude/scripts/statusline-ring.py"
   },
   "enabledPlugins": {
-    "swift-lsp@claude-plugins-official": true,
+    "swift-lsp@claude-plugins-official": false,
     "skill-creator@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
@@ -179,26 +178,5 @@
     }
   },
   "voiceEnabled": true,
-  "mcpServers": {
-    "voicevox": {
-      "command": "npx",
-      "args": [
-        "@t09tanaka/mcp-simple-voicevox"
-      ]
-    },
-    "context7": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@upstash/context7-mcp"
-      ]
-    },
-    "playwright": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@executeautomation/playwright-mcp-server"
-      ]
-    }
-  }
+  "mcpServers": {}
 }
