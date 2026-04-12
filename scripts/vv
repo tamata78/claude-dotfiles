@@ -32,7 +32,7 @@ find_endpoint() {
   IFS=',' read -ra EP_LIST <<< "$ENDPOINTS"
   for ep in "${EP_LIST[@]}"; do
     ep="$(echo "$ep" | xargs)"  # trim spaces
-    if curl -s --max-time 1 "${ep}/version" >/dev/null 2>&1; then
+    if curl -s --max-time 3 "${ep}/version" >/dev/null 2>&1; then
       echo "$ep"
       return 0
     fi
@@ -48,7 +48,7 @@ if [ "${1}" = "--config" ]; then
   echo "  設定ファイル: ${CONFIG_FILE}"
   EP=$(find_endpoint)
   if [ $? -eq 0 ]; then
-    VER=$(curl -s --max-time 2 "${EP}/version" 2>/dev/null)
+    VER=$(curl -s --max-time 5 "${EP}/version" 2>/dev/null)
     echo "  接続先: ${EP} (version: ${VER})"
   else
     echo "  接続先: 接続不可"
@@ -99,7 +99,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # --- 音声合成 ---
-QUERY=$(curl -s --max-time 5 -X POST "${BASE_URL}/audio_query" \
+QUERY=$(curl -s --max-time 15 -X POST "${BASE_URL}/audio_query" \
   --data-urlencode "text=${TEXT}" \
   --data-urlencode "speaker=${SPEAKER}" -G 2>/dev/null)
 
@@ -110,6 +110,6 @@ fi
 
 echo "$QUERY" | \
   python3 -c "import json,sys; d=json.load(sys.stdin); d['speedScale']=${SPEED}; print(json.dumps(d))" | \
-  curl -s --max-time 10 -X POST "${BASE_URL}/synthesis?speaker=${SPEAKER}" \
+  curl -s --max-time 30 -X POST "${BASE_URL}/synthesis?speaker=${SPEAKER}" \
   -H "Content-Type: application/json" -d @- -o /tmp/vv_out.wav 2>/dev/null && \
   afplay /tmp/vv_out.wav

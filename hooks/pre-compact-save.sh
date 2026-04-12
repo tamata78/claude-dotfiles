@@ -35,7 +35,7 @@ if [ -z "$TRANSCRIPT" ] || [ ! -f "$TRANSCRIPT" ]; then
   exit 0
 fi
 
-# 直近のユーザーメッセージを最大5件抽出
+# 直近のユーザーメッセージを最大3件・100文字に簡潔化
 RECENT_USER=$(jq -r '
   select(type == "object") |
   select(.type == "user") |
@@ -47,10 +47,10 @@ RECENT_USER=$(jq -r '
   end |
   select(. != "") |
   gsub("\\n"; " ") |
-  .[0:200]
-' "$TRANSCRIPT" 2>/dev/null | tail -5)
+  .[0:100]
+' "$TRANSCRIPT" 2>/dev/null | tail -3)
 
-# 直近のアシスタントメッセージを最大3件抽出
+# 直近のアシスタント応答を最大2件・100文字に簡潔化
 RECENT_ASSISTANT=$(jq -r '
   select(type == "object") |
   select(.type == "assistant") |
@@ -62,27 +62,18 @@ RECENT_ASSISTANT=$(jq -r '
   end |
   select(. != "") |
   gsub("\\n"; " ") |
-  .[0:300]
-' "$TRANSCRIPT" 2>/dev/null | tail -3)
+  .[0:100]
+' "$TRANSCRIPT" 2>/dev/null | tail -2)
 
 # コンテキストファイルに書き出し
 cat > "$OUTPUT_FILE" << EOF
 # Last Session Context
-
-- **保全日時**: $TIMESTAMP
-- **セッションID**: $SESSION_ID
-- **作業ディレクトリ**: $CWD
-- **作業プロジェクト**: $ACTIVE_PROJECT
-- **Compactトリガー**: $TRIGGER
-
-## 直近のユーザーメッセージ（最大5件）
-
+- **日時**: $TIMESTAMP | **プロジェクト**: $ACTIVE_PROJECT
+## ユーザー
 $(echo "$RECENT_USER" | while IFS= read -r line; do
   [ -n "$line" ] && echo "- $line"
 done)
-
-## 直近のアシスタント応答（最大3件）
-
+## アシスタント
 $(echo "$RECENT_ASSISTANT" | while IFS= read -r line; do
   [ -n "$line" ] && echo "- $line"
 done)

@@ -47,6 +47,8 @@ def main():
         "label": label,
         "cwd": os.getcwd(),
     }
+    if tool_name == "Agent":
+        entry["model"] = tool_input.get("model", "default")
 
     try:
         with open(log_file, "a") as f:

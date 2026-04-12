@@ -42,7 +42,7 @@
       "Bash(npm install *)",
       "Bash(npm init *)",
       "Bash(npx tsc *)",
-"Bash(claude-team:*)",
+      "Bash(claude-team:*)",
       "Bash(mgrep *)",
       "Bash(cd * && npm *)",
       "Bash(cd * && npx tsc *)",
@@ -67,7 +67,7 @@
       "Bash(chmod -R 777*)"
     ]
   },
-  "model": "opus",
+  "model": "opusplan",
   "hooks": {
     "SessionStart": [
       {
@@ -167,7 +167,8 @@
   },
   "enabledPlugins": {
     "swift-lsp@claude-plugins-official": false,
-    "skill-creator@claude-plugins-official": true
+    "skill-creator@claude-plugins-official": true,
+    "caveman@caveman": true
   },
   "extraKnownMarketplaces": {
     "anthropic-agent-skills": {
@@ -175,8 +176,18 @@
         "source": "github",
         "repo": "anthropics/skills"
       }
+    },
+    "caveman": {
+      "source": {
+        "source": "github",
+        "repo": "JuliusBrussee/caveman"
+      }
     }
   },
   "voiceEnabled": true,
-  "mcpServers": {}
+  "mcpServers": {},
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  }
 }
