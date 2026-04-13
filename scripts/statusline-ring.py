@@ -10,15 +10,17 @@ from typing import Optional
 JST = timezone(timedelta(hours=9))
 
 def make_emoji_ring(pct: float, size: int = 6) -> str:
-    """Create an emoji meter based on percentage."""
+    """Create a colored ASCII block meter based on percentage."""
     filled = round(pct / 100 * size)
     if pct < 60:
-        block = "🟩"
+        color = "\033[32m"  # green
     elif pct < 85:
-        block = "🟨"
+        color = "\033[33m"  # yellow
     else:
-        block = "🟥"
-    return block * filled + "⬜" * (size - filled)
+        color = "\033[31m"  # red
+    reset = "\033[0m"
+    bar = "\u2588" * filled + "\u2591" * (size - filled)
+    return f"{color}{bar}{reset}"
 
 def fmt_reset(resets_at: Optional[object], mode: str) -> str:
     """Parse resets_at (Unix epoch number or ISO 8601 string) and return JST formatted string."""
