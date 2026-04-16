@@ -194,9 +194,9 @@ git commit -m "<変更内容を端的に表すメッセージ>"
 - **ファイル構成セクション** — 追加したファイル・ディレクトリを反映する
 - 更新後、ユーザーへの確認は不要。次のステップへ進む。
 
-## ステップ9: Dev Portal設定同期（オプション）
+## ステップ9: Dev Portal設定同期（必須）
 
-dotfilesの変更をDev Portalのデータにも反映する。
+dotfilesの変更をDev Portalのデータに反映する。**claude-dotfilesを変更した場合は必ず実行すること。**
 
 ```bash
 # Dev Portalリポジトリを探す
@@ -213,7 +213,16 @@ done
   ```bash
   cd "$DEV_PORTAL_DIR" && npm run sync
   ```
-  完了したらユーザーに「Dev Portalの設定同期も完了しました」と報告する。
+  `npm run sync` は以下のページデータを更新する：
+  - **`token-analysis`** ページ: `data/private/token-analysis.json`
+  - **`claude-settings`** ページ: `data/public/global.json`, `data/public/hooks.json`, `data/public/skills.json`, `data/public/commands.json` など
+  
+  完了後、ユーザーに以下を報告する：
+  ```
+  ✅ Dev Portal同期完了
+    - token-analysis ページ更新済み
+    - claude-settings ページ更新済み
+  ```
 
 - **見つからなかった場合**: サイレントスキップ。エラーにしない。ユーザーへの報告も不要。
 
