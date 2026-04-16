@@ -91,16 +91,6 @@
         ]
       }
     ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 $HOME/.claude/hooks/stop-nudge.py"
-          }
-        ]
-      }
-    ],
     "UserPromptSubmit": [
       {
         "hooks": [
@@ -114,7 +104,7 @@
     ],
     "PreToolUse": [
       {
-        "matcher": ".*",
+        "matcher": "Bash|Edit|Write|Agent|Skill",
         "hooks": [
           {
             "type": "command",
@@ -131,16 +121,7 @@
     ],
     "PostToolUse": [
       {
-        "matcher": "Write|Edit|Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 $HOME/.claude/hooks/operation-logger.py"
-          }
-        ]
-      },
-      {
-        "matcher": ".*",
+        "matcher": "Bash|Edit|Write|Agent",
         "hooks": [
           {
             "type": "command",
