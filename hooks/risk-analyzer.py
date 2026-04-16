@@ -205,7 +205,7 @@ def main():
         reason = "\n".join(lines)
         print(reason, file=sys.stderr)
 
-        decision = "allow" if risk_level.startswith("🟢") else "ask"
+        decision = "ask" if risk_level.startswith("🔴") else "allow"
         result = {
             "hookSpecificOutput": {
                 "hookEventName": "PreToolUse",
