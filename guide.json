@@ -68,7 +68,6 @@
     { "cmd": "/pr-review <PR番号>", "desc": "GitHub PRの差分をレビューしてコメントを投稿" },
     { "cmd": "/cleanup", "desc": "session-env・plans等の古いファイルを整理" },
     { "cmd": "/rpi <タスク説明>", "desc": "Research→Plan→Implementのフェーズゲート付きワークフロー（大規模機能開発向け）", "isNew": true },
-    { "cmd": "/review-rules", "desc": "ルール・スキルの棚卸しレポート作成。重複・矛盾・肥大化を検出し改善提案", "isNew": true },
     { "cmd": "/tips", "desc": "Claude Code・スキル開発に関する品質向上のヒント集（ルールではなく推奨事項）", "isNew": true },
     { "cmd": "/team", "desc": "Claude Code Agent Teams ヘルプ", "isNew": true }
   ],

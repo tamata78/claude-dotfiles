@@ -63,7 +63,6 @@ link "settings.json"
 # --- コマンド ---
 echo "--- コマンド ---"
 mkdir -p "${CLAUDE_DIR}/commands"
-link "commands/review-rules.md"
 link "commands/team.md"
 link "commands/commit.md"
 link "commands/quick-review.md"
