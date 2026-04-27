@@ -55,7 +55,8 @@
       "Bash(cd * && git log*)",
       "Bash(cd * && git add *)",
       "Bash(cd * && git commit *)",
-      "Bash(node $HOME/.claude/*)"
+      "Bash(node $HOME/.claude/*)",
+      "Bash(bat *)"
     ],
     "deny": [
       "Bash(sudo *)",

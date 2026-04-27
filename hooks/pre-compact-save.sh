@@ -79,6 +79,23 @@ $(echo "$RECENT_ASSISTANT" | while IFS= read -r line; do
 done)
 EOF
 
+# Obsidian wiki log.md に session エントリを append
+if [ -z "$OBSIDIAN_VAULT" ]; then
+  printf "OBSIDIAN_VAULT が未設定です。Vault パスを入力してください（空Enter でスキップ）: " >&2
+  read -r vault_input </dev/tty
+  [ -n "$vault_input" ] && export OBSIDIAN_VAULT="$vault_input"
+fi
+WIKI_LOG="${OBSIDIAN_VAULT:+$OBSIDIAN_VAULT/log.md}"
+if [ -n "$WIKI_LOG" ] && [ -f "$WIKI_LOG" ]; then
+  SESSION_SUMMARY=""
+  if [ -n "$RECENT_USER" ]; then
+    SESSION_SUMMARY=$(echo "$RECENT_USER" | tail -1 | cut -c1-80)
+  fi
+  printf "\n## [%s] session | compact\n%s\n" \
+    "$(date '+%Y-%m-%d %H:%M')" \
+    "${SESSION_SUMMARY:-（コンテキスト圧縮）}" >> "$WIKI_LOG"
+fi
+
 # Hook使用ログ記録
 python3 "$HOME/.claude/hooks/usage-log.py" Hook pre-compact-save.sh &
 

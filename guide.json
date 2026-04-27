@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.3.0",
   "tokenSavingTip": "グローバル CLAUDE.md は全プロジェクトで毎回読み込まれます。プロジェクト固有の知識は各プロジェクトの CLAUDE.md に移動することでトークンを節約できます。",
   "configTypes": [
     {
@@ -67,29 +67,31 @@
     { "cmd": "/release <version>", "desc": "レビュー→テスト→バージョンバンプ→CHANGELOG→commit→pushの一連フロー" },
     { "cmd": "/pr-review <PR番号>", "desc": "GitHub PRの差分をレビューしてコメントを投稿" },
     { "cmd": "/cleanup", "desc": "session-env・plans等の古いファイルを整理" },
-    { "cmd": "/rpi <タスク説明>", "desc": "Research→Plan→Implementのフェーズゲート付きワークフロー（大規模機能開発向け）", "isNew": true },
-    { "cmd": "/tips", "desc": "Claude Code・スキル開発に関する品質向上のヒント集（ルールではなく推奨事項）", "isNew": true },
-    { "cmd": "/team", "desc": "Claude Code Agent Teams ヘルプ", "isNew": true }
+    { "cmd": "/rpi <タスク説明>", "desc": "Research→Plan→Implementのフェーズゲート付きワークフロー（大規模機能開発向け）" },
+    { "cmd": "/tips", "desc": "Claude Code・スキル開発に関する品質向上のヒント集（ルールではなく推奨事項）" },
+    { "cmd": "/team", "desc": "Claude Code Agent Teams ヘルプ" },
+    { "cmd": "/create-pr", "desc": "現在ブランチのPRを自動作成（差分確認→タイトル・本文生成→push→gh pr create）", "isNew": true },
+    { "cmd": "/pr-fix", "desc": "PRレビューコメントを1件ずつ修正提案→確認→適用のインタラクティブフローで対応", "isNew": true },
+    { "cmd": "/handoff", "desc": "現在の作業状況を引き継ぎファイルにまとめてセッション間の文脈を保存", "isNew": true },
+    { "cmd": "/test-spec <チケット>", "desc": "テスト仕様書（Spec・テストケースマトリクス・テストケース）を自動生成", "isNew": true },
+    { "cmd": "/dependency-audit", "desc": "npm/pip の outdated パッケージを分析し破壊的変更リスクを含めた更新計画を生成", "isNew": true },
+    { "cmd": "/project-init", "desc": "新規プロジェクトに .claude/・CLAUDE.md・snapshot.md を一括セットアップ", "isNew": true },
+    { "cmd": "/security-audit", "desc": ".env漏洩・依存脆弱性・ハードコード秘密鍵を一括検出", "isNew": true }
   ],
   "skills": [
-    { "name": "/project-init", "desc": "新規プロジェクトに CLAUDE.md・.claude/ を一括セットアップ" },
-    { "name": "/security-audit", "desc": ".env漏洩・依存脆弱性・ハードコード秘密鍵を一括検出" },
-    { "name": "/dependency-audit", "desc": "npm outdated / pip outdated を分析し安全な更新計画を生成" },
     { "name": "/feature-dev", "desc": "設計→実装→ビルド→テストの開発ワークフロー（大規模時はteam提案）" },
     { "name": "/project-snapshot", "desc": "開発知見をスナップショットとして保存（次回セッションで自動復元）" },
-    { "name": "/token-audit", "desc": "CLAUDE.md・スキルのトークン消費を監査して削減施策を提案" },
-    { "name": "/claude-md-improver", "desc": "CLAUDE.mdを分析しベストプラクティスに基づいた改善提案と修正を行う", "isNew": true },
-    { "name": "/dotfiles-sync", "desc": "claude-dotfilesリポジトリに共通設定を同期する", "isNew": true },
-    { "name": "/skill-tips", "desc": "ユーザーの発言に関連する便利なスキルをさりげなく紹介する", "isNew": true }
+    { "name": "/dotfiles-sync", "desc": "claude-dotfilesリポジトリに共通設定を同期する" },
+    { "name": "/git-acct", "desc": "gitアカウントをwork/personalでワンコマンド切り替え" },
+    { "name": "/config-audit", "desc": "~/.claude/設定のトークン消費・ルール品質を一括監査し改善施策を提案", "isNew": true }
   ],
   "hooks": [
     { "event": "SessionStart", "file": "session-start-snapshot.sh", "desc": "スナップショット読み込み・セッション時刻記録・古いsession-env自動削除（30日）" },
     { "event": "PreCompact", "file": "pre-compact-save.sh", "desc": "コンテキスト圧縮前にlast-session.mdとして保存" },
-    { "event": "PermissionRequest", "file": "risk-analyzer.py", "desc": "ツール実行のリスクを自動評価して承認判断を支援" },
-    { "event": "PostToolUse", "file": "operation-logger.py", "desc": "Write・Edit・git commit等の操作を~/.claude/session-env/operation-log.jsonlに記録" },
-    { "event": "PostToolUse", "file": "auto-format.py", "desc": "Write/Edit後にprettier・black・gofmt等で自動フォーマット（非同期・フォーマッターが存在する場合のみ）", "isNew": true },
-    { "event": "Stop", "file": "stop-nudge.py", "desc": "ファイル編集後にビルド・テスト未確認の場合、確認を促すナッジを1回送信", "isNew": true },
-    { "event": "PreToolUse", "file": "skill-usage-tracker.py", "desc": "Skill/Agentツールの呼び出しを~/.claude/session-env/skill-usage.jsonlに記録", "isNew": true }
+    { "event": "PreToolUse", "file": "risk-analyzer.py", "desc": "Bash/Edit/Write/Agent/Skillツール実行前にリスクを自動評価して承認判断を支援" },
+    { "event": "PreToolUse", "file": "skill-usage-tracker.py", "desc": "Skill/Agentツールの呼び出しを~/.claude/session-env/skill-usage.jsonlに記録" },
+    { "event": "PostToolUse", "file": "auto-format.py", "desc": "Write/Edit後にprettier・black・gofmt等で自動フォーマット（非同期・フォーマッターが存在する場合のみ）" },
+    { "event": "PostToolUse", "file": "post-risk-logger.py", "desc": "risk-analyzerの判定に対しユーザーがapprove/denyした結果を記録" }
   ],
   "mcpServers": [
     { "name": "context7", "pkg": "@upstash/context7-mcp", "desc": "ライブラリの最新ドキュメントを取得してAPI幻覚を防止。use context7 と指示して利用" },
