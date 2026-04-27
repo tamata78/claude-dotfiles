@@ -76,6 +76,10 @@ link "commands/tips.md"
 link "commands/dependency-audit.md"
 link "commands/project-init.md"
 link "commands/security-audit.md"
+link "commands/vault-ingest.md"
+link "commands/vault-query.md"
+link "commands/vault-compress.md"
+link "commands/vault-lint.md"
 link "commands/skill-tips.md"
 
 # --- フック ---

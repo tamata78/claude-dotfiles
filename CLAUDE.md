@@ -32,3 +32,8 @@
 
 ## プラン完了後
 計画をユーザーに提示・承認後、必ず「`/clear` を実行してから実装へ」と促す。
+
+## Obsidian Wiki 操作時
+ユーザー発言に「wikiに書いて」「vaultに退避」「圧縮して」「/compress」「ingestして」等が含まれる場合:
+- 作業前に `~/work/MyVault/CLAUDE.md` を Read tool で読む
+- `~/work/MyVault/log.md` は末尾50行のみ読む（`offset` 指定、全文 Read 禁止）

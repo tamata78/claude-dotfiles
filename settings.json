@@ -109,7 +109,7 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "Bash|Edit|Write|Agent|Skill",
+        "matcher": "Bash|Edit|Write",
         "hooks": [
           {
             "type": "command",
@@ -153,8 +153,9 @@
   },
   "enabledPlugins": {
     "swift-lsp@claude-plugins-official": false,
-    "skill-creator@claude-plugins-official": true,
-    "caveman@caveman": true
+    "skill-creator@claude-plugins-official": false,
+    "caveman@caveman": false,
+    "ui-ux-pro-max@ui-ux-pro-max-skill": false
   },
   "extraKnownMarketplaces": {
     "anthropic-agent-skills": {
