@@ -34,9 +34,9 @@
 計画をユーザーに提示・承認後、必ず「`/clear` を実行してから実装へ」と促す。
 
 ## Obsidian Wiki 連携
-- Vault: `~/workspace/claude-app/t-valt/`（環境変数 `OBSIDIAN_VAULT` で上書き可）
-- スキル: `obsidian-wiki`（ingest / query / lint の3操作）
+- Vault: `$OBSIDIAN_VAULT`（環境変数で各マシンごとに設定。例: `~/work/MyVault/`）
+- スキル・コマンド構成はマシンごとに異なる（Vault 直下の `CLAUDE.md` を参照）
 - 起動キーワード: 「wiki に〜を ingest して」「wiki で〜を調べて」「wiki を lint して」「vaultに退避」「圧縮して」「/compress」等
-- 作業前に Vault 直下の `CLAUDE.md` を Read tool で読む
+- 作業前に `$OBSIDIAN_VAULT/CLAUDE.md` を Read tool で読む
 - ログファイル（例: `log.md`）は末尾 50 行のみ読む（`offset` 指定、全文 Read 禁止）
-- セキュリティ: raw/ には API キー・PII・出前館業務機密を投入禁止（Vault CLAUDE.md 参照）
+- セキュリティ: raw/ には API キー・PII・機密情報を投入禁止（Vault CLAUDE.md 参照）
