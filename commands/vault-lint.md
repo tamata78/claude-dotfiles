@@ -21,7 +21,7 @@
 
    c. **陳腐化検出**: 30 日以上更新の無い非 session ページを `find` で特定し、「古い可能性あり」としてフラグ立て。
 
-   d. **リンク密度チェック**: wiki/ で inbound/outbound wikilink が 0 のページを抽出（orphan 候補）。
+   d. **リンク密度チェック**: wiki/ で outbound wikilink（本文中の `[[]]`）が 1 個以下のページを抽出。HIGH: 0個（orphan）、MEDIUM: 1個（低密度）。MEDIUM以上なら `/vault-relink` 実行を推奨。
 
 4. **レポート出力**: 優先度別に整理して報告
 

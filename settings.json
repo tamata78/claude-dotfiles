@@ -55,8 +55,7 @@
       "Bash(cd * && git log*)",
       "Bash(cd * && git add *)",
       "Bash(cd * && git commit *)",
-      "Bash(node $HOME/.claude/*)",
-      "Bash(bat *)"
+      "Bash(node $HOME/.claude/*)"
     ],
     "deny": [
       "Bash(sudo *)",
@@ -114,13 +113,18 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 $HOME/.claude/hooks/skill-usage-tracker.py",
-            "async": true
-          },
-          {
-            "type": "command",
             "command": "python3 $HOME/.claude/hooks/risk-analyzer.py",
             "statusMessage": "リスク判定中..."
+          }
+        ]
+      },
+      {
+        "matcher": "Skill|Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 $HOME/.claude/hooks/skill-usage-tracker.py",
+            "async": true
           }
         ]
       }
@@ -132,6 +136,16 @@
           {
             "type": "command",
             "command": "python3 $HOME/.claude/hooks/post-risk-logger.py",
+            "async": true
+          }
+        ]
+      },
+      {
+        "matcher": "Bash|Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 $HOME/.claude/hooks/operation-logger.py",
             "async": true
           }
         ]
@@ -152,27 +166,14 @@
     "type": "command",
     "command": "$HOME/.claude/scripts/statusline-ring.py"
   },
-  "enabledPlugins": {
-    "swift-lsp@claude-plugins-official": false,
-    "skill-creator@claude-plugins-official": false,
-    "caveman@caveman": false,
-    "ui-ux-pro-max@ui-ux-pro-max-skill": false
-  },
   "extraKnownMarketplaces": {
     "anthropic-agent-skills": {
       "source": {
         "source": "github",
         "repo": "anthropics/skills"
       }
-    },
-    "caveman": {
-      "source": {
-        "source": "github",
-        "repo": "JuliusBrussee/caveman"
-      }
     }
   },
-  "skipAutoPermissionPrompt": true,
   "voiceEnabled": true,
-  "mcpServers": {}
+  "effortLevel": "medium"
 }

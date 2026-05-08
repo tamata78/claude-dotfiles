@@ -1,6 +1,6 @@
 # /vault-ingest — Obsidian Wiki 取り込み
 
-トリガー: `/vault-ingest` または「これ取り込んで」「ingest して」「これ追加して」
+トリガー: `/vault-ingest` または「これ取り込んで」「ingest して」「これ追加して」「wiki を作って」「wiki に書いて」「wiki に追加して」「ページを作って」
 
 ## 手順
 
@@ -18,17 +18,12 @@
    
    slug: 内容を表す英数字 kebab-case（例: `llm-wiki-pattern`）
 
-4. **要約提示**: 以下をユーザーに提示して確認 → 議論 → 修正受付
-   - 80 字以内の要約
-   - 抽出エンティティ（人物名・概念・分野）
-   - 影響する既存 wiki/ ページの候補
-   - 新規作成すべき wiki/ ページの候補
-
-5. **wiki 書込**: ユーザー確認後に実行
+4. **wiki 書込**: 確認なしで即実行
    - 既存ページがあれば merge（`mcp__obsidian__edit-note` で append または find_and_replace）
    - 新規の場合は `mcp__obsidian__create-note` で `wiki/{category}/{title}.md` を作成
    - frontmatter 必須（tags / summary / related）
    - 本文に `出典: [[raw/xxx]]` を付与
+   - **自動リンク挿入**: `index.md` を Read してwikiページ名リストを取得し、本文中に出現するページ名を `[[ページ名]]` に置換（コードブロック内・既存`[[]]`はスキップ）。frontmatter の `related:` にも同リンクを追記
 
 6. **index.md 更新**: `mcp__obsidian__edit-note` で該当カテゴリに追記
    - 既存エントリと重複しないか確認
@@ -43,7 +38,11 @@
    - Obsidian Clipper 由来（`raw/clipper/`）の場合は削除を推奨
    - 手動貼付（`raw/paste/`）は念のため確認してから削除
 
-9. 完了報告: 「Obsidian graph view で `wiki/yyy` のリンクを確認してください」と伝える
+9. **wiki 内容表示**: `mcp__obsidian__read-note` で作成・更新したメインの wiki ページ（raw/ や index.md ではなく `wiki/` 配下のページ）を読み込み、内容をそのままユーザーに表示する
+
+10. 完了報告: 以下を伝える
+    - 作成・更新したページのカテゴリとパス（例: `wiki/学び/成功の法則/ページ名.md`）
+    - 「Obsidian graph view で上記ページのリンクを確認してください」
 
 ## 注意
 
