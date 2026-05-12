@@ -5,6 +5,10 @@
   },
   "permissions": {
     "allow": [
+      "Edit(**/settings.local.json)",
+      "Write(**/settings.local.json)",
+      "Edit(~/.zshrc)",
+      "Write(~/.zshrc)",
       "Bash(~/.local/bin/vv:*)",
       "Bash(~/.local/bin/vv-mute:*)",
       "WebSearch",
@@ -72,7 +76,6 @@
     ],
     "defaultMode": "auto"
   },
-  "model": "opusplan",
   "hooks": {
     "SessionStart": [
       {
@@ -174,6 +177,7 @@
       }
     }
   },
+  "effortLevel": "medium",
   "voiceEnabled": true,
-  "effortLevel": "medium"
+  "skipAutoPermissionPrompt": true
 }

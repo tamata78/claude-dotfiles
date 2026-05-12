@@ -40,5 +40,5 @@
 - スキル・コマンド構成はマシンごとに異なる（Vault 直下の `CLAUDE.md` を参照）
 - 起動キーワード: 「wiki に〜を ingest して」「wiki を作って」「wiki に書いて」「ページを作って」「wiki で〜を調べて」「wiki を lint して」「再リンク」「relink」「vaultに退避」「圧縮して」「/compress」等
 - 作業前に `$OBSIDIAN_VAULT/CLAUDE.md` を Read tool で読む
-- ログファイル（例: `log.md`）は先頭 50 行のみ読む（降順なので `offset` 不要、全文 Read 禁止）
+- ログファイル（例: `log.md`）は先頭 50 行のみ読む（`limit: 50` 指定、全文 Read 禁止。新しいエントリが先頭に来る方式）
 - セキュリティ: raw/ には API キー・PII・機密情報を投入禁止（Vault CLAUDE.md 参照）
