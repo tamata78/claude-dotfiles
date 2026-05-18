@@ -177,7 +177,7 @@
       }
     }
   },
-  "effortLevel": "medium",
-  "voiceEnabled": true,
-  "skipAutoPermissionPrompt": true
+  "effortLevel": "xhigh",
+  "skipAutoPermissionPrompt": true,
+  "voiceEnabled": true
 }
