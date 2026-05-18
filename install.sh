@@ -60,6 +60,10 @@ link "voicevox-scripts.md"
 echo "--- 設定 ---"
 link "settings.json"
 
+# --- 共有フラグメント（レビュー規約など） ---
+echo "--- 共有フラグメント ---"
+link_dir "shared"
+
 # --- コマンド ---
 echo "--- コマンド ---"
 mkdir -p "${CLAUDE_DIR}/commands"
