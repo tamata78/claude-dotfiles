@@ -76,6 +76,7 @@
     ],
     "defaultMode": "auto"
   },
+  "model": "opusplan",
   "hooks": {
     "SessionStart": [
       {
@@ -179,5 +180,6 @@
   },
   "effortLevel": "xhigh",
   "skipAutoPermissionPrompt": true,
-  "voiceEnabled": true
+  "voiceEnabled": true,
+  "agentPushNotifEnabled": true
 }
