@@ -21,6 +21,10 @@
     "commands/vault-query.md": { "scope": "common", "type": "command" },
     "commands/vault-compress.md": { "scope": "common", "type": "command" },
     "commands/vault-lint.md": { "scope": "common", "type": "command" },
+    "commands/vault-daily-brief.md": { "scope": "common", "type": "command" },
+    "commands/vault-weekly-synthesis.md": { "scope": "common", "type": "command" },
+    "commands/back-merge.md": { "scope": "common", "type": "command" },
+    "commands/create-github-release.md": { "scope": "common", "type": "command" },
     "hooks/auto-format.py": { "scope": "common", "type": "hook" },
     "hooks/command-usage-tracker.py": { "scope": "common", "type": "hook" },
     "hooks/usage-log.py": { "scope": "common", "type": "script" },
@@ -37,6 +41,7 @@
     "skills/feature-dev": { "scope": "common", "type": "skill" },
     "skills/project-snapshot": { "scope": "common", "type": "skill" },
     "skills/config-audit": { "scope": "common", "type": "skill" },
+    "skills/caveman": { "scope": "common", "type": "skill" },
     "agent-teams": { "scope": "common", "type": "agent-team" },
     "git-hooks/pre-commit": { "scope": "common", "type": "git-hook" },
     "git-hooks/commit-msg": { "scope": "common", "type": "git-hook" }

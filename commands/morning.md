@@ -67,7 +67,7 @@ head -50 "$OBSIDIAN_VAULT/log.md" 2>/dev/null
 ### 2-F. Obsidian Vault — 直近ブリーフの PATTERN / QUESTION
 
 ```bash
-LATEST=$(ls -t "$OBSIDIAN_VAULT/reports/daily-brief-"*.html 2>/dev/null | head -1)
+LATEST=$(ls -t "$OBSIDIAN_VAULT/reports/daily/"*.html 2>/dev/null | head -1)
 [ -n "$LATEST" ] && grep -m5 -E "(PATTERN|QUESTION|<h2)" "$LATEST" 2>/dev/null
 ```
 

@@ -1,32 +1,40 @@
 # /vault-daily-brief — Obsidian Daily Brief
 
-トリガー: `/vault-daily-brief` または「daily brief」「朝のブリーフィング」「今日の繋がりを教えて」「今日の問い」
+トリガー: `/vault-daily-brief` または「daily brief」「デイリーブリーフ」「朝のブリーフィング」「朝会」「今日の繋がりを教えて」「今日の問い」「今日のブリーフ」
 
 ## 概要
 
-raw/ 直近 24h の新規ファイル + wiki/ 直近 7d の編集ファイルを横断し、3 種類のフィードバックを生成して `reports/daily/YYYY-MM-DD.md` に保存する。
+raw/ 直近 24h + wiki/ 直近 7d + ideas/ 直近 7d + log.md 先頭 30 件を横断し、3 種類のフィードバック（CONNECTIONS / PATTERN / QUESTION）を生成して MD + HTML で保存する。HTML はブラウザで自動 open する。
 
 ## 手順
 
-1. **作業前**: `~/work/MyVault/CLAUDE.md` を Read tool で読む（規約確認）
+1. **作業前**: `$OBSIDIAN_VAULT/CLAUDE.md` を Read tool で読む（規約 + 「私は誰か」「現在のプロジェクト」の文脈）
 
-2. **直近 raw を特定**:
+2. **同日スキップ判定**:
    ```bash
-   find $OBSIDIAN_VAULT/raw -name "*.md" -newer "$( date -v-1d +%Y-%m-%d ).md" -not -name ".gitkeep" 2>/dev/null | head -20
-   ```
-   または Bash で `find $OBSIDIAN_VAULT/raw -name "*.md" -mtime -1`
-
-3. **直近 wiki を特定**:
-   ```bash
-   find $OBSIDIAN_VAULT/wiki -name "*.md" -mtime -7 -not -name ".gitkeep" | head -30
+   TODAY=$(date +%Y-%m-%d)
+   EXISTING="$OBSIDIAN_VAULT/reports/daily/${TODAY}.html"
+   [ -f "$EXISTING" ] && open "$EXISTING" && echo "既存の Daily Brief を開きました" && exit 0
    ```
 
-4. **ファイル内容を読む**: 特定したファイルを Read tool で読む（raw は全文、wiki は先頭 100 行）
+3. **入力ファイルの特定**:
+   ```bash
+   # 直近 24h の raw
+   find "$OBSIDIAN_VAULT/raw" -name "*.md" -mtime -1 -not -name ".gitkeep" 2>/dev/null | head -20
+   # 直近 7d の wiki
+   find "$OBSIDIAN_VAULT/wiki" -name "*.md" -mtime -7 -not -name ".gitkeep" 2>/dev/null | head -30
+   # 直近 7d の ideas
+   find "$OBSIDIAN_VAULT/ideas" -name "*.md" -mtime -7 -not -name ".gitkeep" 2>/dev/null | head -20
+   # log.md 先頭 30 行（最新の流れの把握）
+   head -30 "$OBSIDIAN_VAULT/log.md" 2>/dev/null
+   ```
+
+4. **ファイル内容を読む**: 合計 10 件まで Read（raw は全文、wiki/ideas は先頭 100 行）。多ければ新しい順に優先。
 
 5. **3 つのフィードバックを生成**:
 
    **CONNECTIONS** (繋がり 3 件):
-   - 直近 raw と過去 wiki ノートとの、あなたが気づいていない繋がりを 3 件
+   - 直近 raw / ideas と過去 wiki ノートとの、ユーザーが気づいていない繋がりを 3 件
    - 各件: 原文引用（50 字以内）+ 繋がり先の wiki ページ名 + なぜ繋がるかの一文
    - 形式: `1. [[wiki/xxx]] ← "引用" → 繋がりの説明`
 
@@ -38,27 +46,26 @@ raw/ 直近 24h の新規ファイル + wiki/ 直近 7d の編集ファイルを
    - PATTERN を受けて、今日 1 日抱えるべき問い 1 つ
    - タスクではなく問いの形で（「〜とは何か」「〜すべき理由は」等）
 
-6. **reports/daily/ に保存**:
+6. **MD を保存**:
    - パス: `$OBSIDIAN_VAULT/reports/daily/YYYY-MM-DD.md`
-   - Write tool で作成
-   - frontmatter 付き:
-     ```yaml
-     ---
-     tags:
-       - reports/daily
-     summary: YYYY-MM-DD Daily Brief
-     related: []
-     ---
-     ```
+   - Write tool で作成、frontmatter 付き（下記フォーマット参照）
 
-7. **log.md に追記** (先頭に):
+7. **HTML を生成**:
+   - パス: `$OBSIDIAN_VAULT/reports/daily/YYYY-MM-DD.html`
+   - スタイル参考: `$OBSIDIAN_VAULT/wiki/claude/HTMLプレビュー生成ガイド.md` を Read
+   - セクション 3 つ（CONNECTIONS / PATTERN / QUESTION）
+   - 各 CONNECTION は折りたたみ可能、リンクは `obsidian://open?vault=<vault-name>&file=<encoded-path>` 形式でも併記
+   - 完了後に `Bash: open "$OBSIDIAN_VAULT/reports/daily/${TODAY}.html"` でブラウザ起動
+
+8. **log.md に prepend**（先頭に追加。Edit ツールで先頭行を差し替え）:
    ```
-   ## [YYYY-MM-DD] daily-brief | reports/daily/YYYY-MM-DD.md
+   ## [YYYY-MM-DD HH:MM] daily-brief | reports/daily/YYYY-MM-DD.md
+   PATTERN: {1行}。QUESTION: {1行}。CONNECTIONS: {3ページ名}。
    ```
 
-8. **ユーザーに提示**: 生成した 3 つのフィードバックをそのままテキストで出力する
+9. **ユーザーに提示**: 生成した 3 つのフィードバックをそのままテキストで出力（HTML は別途ブラウザで開いている）
 
-## 出力フォーマット
+## MD 出力フォーマット
 
 ```markdown
 ---
@@ -89,5 +96,13 @@ related: []
 
 - raw/ は read-only。このスキルでは読むだけで書き込まない
 - wiki/ も読むだけ（編集しない）
-- reports/daily/ のみ書き込む
-- 直近 raw が 0 件の場合は wiki/ 直近 7d だけで分析する
+- 書き込みは `reports/daily/` と `log.md`（prepend）のみ
+- 直近 raw が 0 件の場合は wiki/ + ideas/ 直近 7d だけで分析する
+- 該当する新規ソースが少ない日は「今日は静かな日。{PATTERN} を進める時間」とだけ返す（MD/HTML も最小化）
+- 同日に既存 HTML があればスキップして既存ファイルを open
+
+## 完了通知
+
+```bash
+~/.local/bin/vv "デイリーブリーフが完成したのだ"
+```
