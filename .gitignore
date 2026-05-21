@@ -12,3 +12,10 @@ settings.local.json
 
 # スキルのevalワークスペース（テスト実行結果）
 skills/*-workspace/
+
+# 環境依存・このリポジトリで管理しないコマンド
+commands/back-merge.md
+commands/create-github-release.md
+
+# プロジェクト固有のセッション情報（snapshot 等）
+.claude/
