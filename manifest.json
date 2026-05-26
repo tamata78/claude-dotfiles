@@ -23,7 +23,7 @@
     "commands/vault-lint.md": { "scope": "common", "type": "command" },
     "commands/vault-daily-brief.md": { "scope": "common", "type": "command" },
     "commands/vault-weekly-synthesis.md": { "scope": "common", "type": "command" },
-    "commands/back-merge.md": { "scope": "common", "type": "command" },
+    "commands/create-release-back-merge-pr.md": { "scope": "common", "type": "command" },
     "commands/create-github-release.md": { "scope": "common", "type": "command" },
     "hooks/auto-format.py": { "scope": "common", "type": "hook" },
     "hooks/command-usage-tracker.py": { "scope": "common", "type": "hook" },

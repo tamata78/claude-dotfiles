@@ -85,7 +85,7 @@ link "commands/vault-compress.md"
 link "commands/vault-lint.md"
 link "commands/vault-daily-brief.md"
 link "commands/vault-weekly-synthesis.md"
-link "commands/back-merge.md"
+link "commands/create-release-back-merge-pr.md"
 link "commands/create-github-release.md"
 
 # --- フック ---

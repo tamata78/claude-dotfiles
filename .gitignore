@@ -14,7 +14,7 @@ settings.local.json
 skills/*-workspace/
 
 # 環境依存・このリポジトリで管理しないコマンド
-commands/back-merge.md
+commands/create-release-back-merge-pr.md
 commands/create-github-release.md
 
 # プロジェクト固有のセッション情報（snapshot 等）
