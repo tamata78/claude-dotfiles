@@ -25,20 +25,22 @@
 
 ## トークン最適化
 - サブエージェント振り分け: haiku（検索）/ sonnet（実装）/ opus（大規模設計）
+- **3クエリ以上の探索・ファイル位置特定は `Explore` サブエージェントに委任**（Haiku相当・Sonnet比0.33×）。1〜2 grep 程度は直接実行。
 - ファイル検索はGrepツール優先、バックグラウンド実行は `run_in_background: true` 活用
+
+## タスク管理
+- **3ステップ以上の作業は `TaskCreate` でチェックボックス管理**（Markdown タスクリスト表示で再説明コスト削減）
+- 単発・自明なタスクには使わない
 
 ## コンテキスト管理
 - 50%到達で `/compact` 実行。`/sandbox` で権限プロンプト削減。
-- CLAUDE.md は 200 行 / 25KB 以下に保つ。超過分は `docs/` に分離し、必要時のみ `@docs/xxx.md` で読込（毎セッションの自動消費を抑制）。
-- 機能の実装ステータスは `{CWD}/docs/TASKS.md` で管理し、大タスクは小分けセッションで処理する（コンテキスト肥大防止）。
+- CLAUDE.md は 200 行 / 25KB 以下に保つ。超過分は `docs/` に分離し、必要時のみ `@docs/xxx.md` で読込。
 
 ## プラン完了後
 計画をユーザーに提示・承認後、必ず「`/clear` を実行してから実装へ」と促す。
 
 ## Obsidian Wiki 連携
-- Vault: `$OBSIDIAN_VAULT`（環境変数で各マシンごとに設定。例: `~/work/MyVault/`）
-- スキル・コマンド構成はマシンごとに異なる（Vault 直下の `CLAUDE.md` を参照）
-- 起動キーワード: 「wiki に〜を ingest して」「wiki を作って」「wiki に書いて」「ページを作って」「wiki で〜を調べて」「wiki を lint して」「再リンク」「relink」「vaultに退避」「圧縮して」「/compress」等
-- 作業前に `$OBSIDIAN_VAULT/CLAUDE.md` を Read tool で読む
-- ログファイル（例: `log.md`）は先頭 50 行のみ読む（`limit: 50` 指定、全文 Read 禁止。新しいエントリが先頭に来る方式）
-- セキュリティ: raw/ には API キー・PII・機密情報を投入禁止（Vault CLAUDE.md 参照）
+- Vault 作業時は必ず `$OBSIDIAN_VAULT/CLAUDE.md` を Read してから着手（スキル・規約・ログ扱い記載）
+
+## 出力モード（caveman 常時 ON）
+全セッションで caveman モード（full intensity）。「通常モード」「normal mode」「stop caveman」で解除。
