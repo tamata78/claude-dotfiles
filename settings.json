@@ -76,7 +76,6 @@
     ],
     "defaultMode": "auto"
   },
-  "model": "claude-opus-4-7",
   "hooks": {
     "SessionStart": [
       {
