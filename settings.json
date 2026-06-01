@@ -170,6 +170,7 @@
     "command": "$HOME/.claude/scripts/statusline-ring.py"
   },
   "extraKnownMarketplaces": {},
+  "effortLevel": "high",
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
   "voiceEnabled": true

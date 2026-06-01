@@ -23,16 +23,18 @@ review_path = os.environ.get('REVIEW_PATH', '')
 with open(snapshot_path) as f:
     snapshot_content = f.read()
 
-# 品質レビューが存在すれば最新エントリを抽出
+# 品質レビューが存在すればスコア合計行のみ抽出（トークン節約）
 review_section = ''
 if review_path and os.path.exists(review_path):
     with open(review_path) as f:
         review_content = f.read()
-    # 最新レビュー（最後の ## で始まるブロック）を取得
     blocks = [b for b in review_content.split('\n## ') if b.strip()]
     if blocks:
         latest = blocks[-1].strip()
-        review_section = '\n\n---\n### 前回の品質レビュー\n## ' + latest
+        score_line = next((l for l in latest.splitlines() if '合計:' in l or 'Total:' in l), None)
+        date_line = latest.splitlines()[0] if latest else ''
+        if score_line:
+            review_section = f'\n\n---\n### 前回レビュー: {date_line} — {score_line.strip()}'
 
 # 分析指示テキスト
 instruction = '''

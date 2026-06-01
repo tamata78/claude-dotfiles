@@ -1,6 +1,6 @@
 ---
 name: dotfiles-sync
-description: claude-dotfilesリポジトリに共通設定を同期するスキル。「dotfilesに反映して」「claude-dotfilesを更新して」「設定を同期して」「新しいスキルをdotfilesに追加して」「dotfilesにpushして」「dotfilesを整理して」などと言われたときは必ずこのスキルを使うこと。~/.claude/の変更・新規ファイルを分析し、ポータブルな設定のみをclaude-dotfilesに反映する。
+description: "~/.claude/変更をclaude-dotfilesに同期するスキル。「dotfilesに反映」「claude-dotfiles更新」「設定を同期」「dotfilesにpush」で起動。"
 ---
 
 # dotfiles-sync

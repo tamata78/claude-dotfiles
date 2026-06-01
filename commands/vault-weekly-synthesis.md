@@ -41,6 +41,7 @@ wiki/ 全体 + reports/daily/ 直近 7 件 + ideas/ 全件 + log.md 直近 7 日
    - log.md と wiki/ の `confidence=low` 記述を中心に
    - 形式: `- [[wiki/xxx]] (旧) vs [[wiki/yyy]] (新): 食い違いの説明`
    - 矛盾なければ「矛盾検出なし」と明記
+   - 「中断・再設計中」マークが付いた wiki ページを追跡し、矛盾する継続記述がないか確認する
 
    **KNOWLEDGE GAPS** (知識の空白):
    - このまま行くと判断を誤る、知識の空白を 2〜3 件

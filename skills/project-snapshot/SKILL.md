@@ -1,6 +1,6 @@
 ---
 name: project-snapshot
-description: プロジェクトの開発知見・現在状態をコンパクトにまとめてファイルに保存するスキル。「プロジェクトのコンテキストを保存して」「スナップショットを取って」「開発知見をまとめて」「project-snapshot」「今の状態を記録して」「セッション情報を保存して」「次回のために記録して」などと言われたとき、または `/project-snapshot` で呼び出されたときに必ず使うこと。また、Planモード（EnterPlanMode/ExitPlanMode）を用いた設計・実装が完了した直後にも自動的に呼び出すこと（feature-devスキル経由か直接Planモードを使ったかに関わらず）。次回セッション開始時に素早く開発に着手できるよう、アーキテクチャ・現状・知見・TODOを1ファイルに凝縮する。
+description: "プロジェクト知見をsnapshot.mdに保存するスキル。「スナップショット」「context保存」「project-snapshot」またはPlanモード完了後に起動。"
 ---
 
 # project-snapshot スキル

@@ -1,6 +1,6 @@
 ---
 name: config-audit
-description: "~/.claude/ 設定の監査スキル。トークン消費分析＋ルール・スキルの品質チェックを一括実行し、番号付き施策テーブルで提案する。「設定監査」「config-audit」「トークン節約」「ルール整理」「スキル棚卸し」「重複検出」「CLAUDE.mdが重い」などで起動。"
+description: "~/.claude/設定監査スキル。トークン消費分析+スキル品質チェック。「設定監査」「config-audit」「トークン節約」「スキル棚卸し」で起動。"
 ---
 
 # config-audit - 設定監査スキル
