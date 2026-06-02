@@ -299,15 +299,6 @@ $OBSIDIAN_VAULT/reports/morning/YYYY-MM-DD.html
   - section-label スケジュール: `background: #fef3c7; color: #b45309;`
   - 番号丸チップ: `background: #f59e0b;`
 
-### log.md への prepend
-
-`$OBSIDIAN_VAULT/log.md` の先頭（ヘッダー直後）に以下を prepend:
-
-```
-## [YYYY-MM-DD HH:MM] morning | reports/morning/YYYY-MM-DD.html
-P0: {優先課題1の見出し}。学習: {1〜2件の見出し}。比率 70:30。
-```
-
 ### ブラウザ起動
 
 ```bash

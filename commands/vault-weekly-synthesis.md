@@ -70,16 +70,10 @@ wiki/ 全体 + reports/daily/ 直近 7 件 + ideas/ 全件 + log.md 直近 7 日
    - セクション 4 つ + 追加質問 + リンクは `obsidian://open?vault=<vault-name>&file=<encoded-path>` 形式で
    - 完了後に `Bash: open "$OBSIDIAN_VAULT/reports/weekly/${WEEK}.html"` でブラウザ起動
 
-10. **log.md に prepend**（先頭に追加）:
-    ```
-    ## [YYYY-MM-DD HH:MM] weekly-synthesis | reports/weekly/YYYY-WW.md
-    THESIS: {要点}。GAPS: {要点}。ONE ACTION: {具体行動}。
-    ```
-
-11. **Vault CLAUDE.md 更新提案**:
+10. **Vault CLAUDE.md 更新提案**:
     - 「現在のプロジェクト」「今読んでいるもの」セクションの古い記述があれば更新をユーザーに提案（stale を生む元）
 
-12. **ユーザーに提示**: 4 つのフィードバックを提示し、矛盾解消が必要な場合は確認を取る
+11. **ユーザーに提示**: 4 つのフィードバックを提示し、矛盾解消が必要な場合は確認を取る
 
 ## MD 出力フォーマット
 
