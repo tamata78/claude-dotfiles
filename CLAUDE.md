@@ -14,19 +14,11 @@
 必ずビルド＋テスト実行して成功を確認。失敗時は修正してから完了報告。
 </important>
 
-## セッション引き継ぎ
-ユーザーが「前回の続き」等と明示した場合のみ `~/.claude/context/last-session.md` を読み込む。
-
-## スナップショット参照
-実装タスク開始時、`{CWD}/.claude/snapshot.md` が存在すれば読み込み「スナップショットを読み込みました」と伝える。
-
 ## コミットメッセージ
 `Co-Authored-By: Claude` 行は含めない。
 
 ## トークン最適化
-- サブエージェント振り分け: haiku（検索）/ sonnet（実装）/ opus（大規模設計）
-- **3クエリ以上の探索・ファイル位置特定は `Explore` サブエージェントに委任**（Haiku相当・Sonnet比0.33×）。1〜2 grep 程度は直接実行。
-- ファイル検索はGrepツール優先、バックグラウンド実行は `run_in_background: true` 活用
+@~/.claude/docs/token-optimization.md
 
 ## タスク管理
 - **3ステップ以上の作業は `TaskCreate` でチェックボックス管理**（Markdown タスクリスト表示で再説明コスト削減）

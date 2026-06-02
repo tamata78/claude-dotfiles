@@ -1,4 +1,5 @@
 ---
+use: work
 name: security-audit
 description: "プロジェクトのセキュリティ監査スキル。「セキュリティチェック」「脆弱性スキャン」「security-audit」「秘密鍵が漏れてないか」「npm audit」などのキーワードで起動。.env漏洩・依存パッケージ脆弱性・ハードコード秘密鍵を一括検出する。"
 ---

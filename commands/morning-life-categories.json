@@ -1,0 +1,20 @@
+{
+  "categories": [
+    {"name": "緘黙チャレンジ", "color_class": "bar-goal",    "slot": "morning", "keywords": ["緘黙", "チャレンジ", "緘黙plan", "Zoom", "zoom", "しりとり", "あーたん", "顔出し", "声出し"]},
+    {"name": "子供教育",       "color_class": "bar-goal",    "slot": "morning", "keywords": ["たい教育", "たい習慣", "長男", "長女", "教育", "習い事", "塾", "学校", "宿題", "勉強のまるつけ", "子供教育"]},
+    {"name": "住宅plan",       "color_class": "bar-goal",    "slot": "morning", "keywords": ["住宅", "家plan", "マイホーム", "住宅plan"]},
+    {"name": "妻サポート",      "color_class": "bar-goal",    "slot": "morning", "keywords": ["妻の仕事", "妻ヒアリング", "妻の装具", "装具"]},
+    {"name": "アプリ改善",      "color_class": "bar-work",    "slot": "evening", "keywords": ["アプリ", "app改善", "App改善", "Claude", "claude", "obsidian", "vault", "wkhis", "time-tracker"]},
+    {"name": "仕事",           "color_class": "bar-work",    "slot": "any",     "keywords": ["work", "職場", "仕事"]},
+    {"name": "投資・家計",      "color_class": "bar-work",    "slot": "evening", "keywords": ["投資", "積立", "SBI", "NISA", "家計", "口座", "積立金"]},
+    {"name": "党活動・発信",    "color_class": "bar-growth",  "slot": "evening", "keywords": ["参政党", "党活動", "ポスター", "月例会", "青年局", "MTG", "ポスター貼り"]},
+    {"name": "修身・学習",      "color_class": "bar-growth",  "slot": "morning", "keywords": ["ほつま", "修身", "歴史", "政治経済", "勉強会", "ヲシテ"]},
+    {"name": "振り返り",        "color_class": "bar-growth",  "slot": "evening", "keywords": ["振り返り", "ふりかえり", "daily-bref", "daily-brief", "モニノート", "ふりかえり"]},
+    {"name": "動画・SNS",      "color_class": "bar-consume",  "slot": "any",     "keywords": ["動画", "SNS", "アニメ", "YouTube", "ユーチューブ", "メディア", "ピアノ", "コヤッキー", "puni", "プライム", "prime", "動画鑑賞", "動画閲覧"]},
+    {"name": "食事・身支度",    "color_class": "bar-life",    "slot": "any",     "keywords": ["ご飯", "ごはん", "あさごはん", "ゆうめし", "夕飯", "ランチ", "身支度", "着替え", "ラジオ体操"]},
+    {"name": "移動・通勤",      "color_class": "bar-life",    "slot": "any",     "keywords": ["移動", "通勤", "帰宅", "PC起動", "送り", "往復"]},
+    {"name": "風呂・休息",      "color_class": "bar-life",    "slot": "any",     "keywords": ["風呂", "お風呂", "睡眠", "起床", "寝た", "少し寝"]}
+  ],
+  "default_category": {"name": "その他", "color_class": "bar-other"},
+  "match_order": "first_match"
+}

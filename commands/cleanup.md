@@ -1,4 +1,5 @@
 ---
+use: work
 description: "session-env・plans・shell-snapshots等の古いファイルを整理する。蓄積したセッションファイルをクリーンアップする"
 ---
 

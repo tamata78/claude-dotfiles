@@ -1,4 +1,5 @@
 ---
+use: work
 description: "PRのコードレビューを実行する。gh コマンドでPR差分を取得し、共有フラグメント (shared/review-rules.md) の規約・観点に従ってレビューしてコメントを投稿する"
 ---
 

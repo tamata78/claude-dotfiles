@@ -1,4 +1,5 @@
 ---
+use: work
 name: project-init
 description: "新規プロジェクトに .claude/ ディレクトリ・CLAUDE.md・snapshot.md を一括セットアップするスキル。「project-init」「プロジェクトを初期化して」「.claudeを作って」などのキーワードで起動。"
 ---

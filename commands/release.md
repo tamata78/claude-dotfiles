@@ -1,4 +1,5 @@
 ---
+use: work
 description: "リリースワークフロー。コードレビュー→テスト→バージョンバンプ→CHANGELOG→commit→push→デプロイの一連フローを実行する"
 ---
 

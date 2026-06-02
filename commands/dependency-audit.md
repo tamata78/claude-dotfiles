@@ -1,4 +1,5 @@
 ---
+use: work
 name: dependency-audit
 description: "依存パッケージの更新状況を監査するスキル。「依存関係の確認」「パッケージ更新」「dependency-audit」「outdatedのチェック」などのキーワードで起動。npm outdated・pip list --outdated の結果を分析し、破壊的変更リスクを含めた更新計画を生成する。"
 ---

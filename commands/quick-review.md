@@ -1,4 +1,5 @@
 ---
+use: work
 description: "ローカル変更（unstaged + staged + 未push commit）をコードレビューする（共有フラグメント shared/review-rules.md を参照）"
 ---
 
