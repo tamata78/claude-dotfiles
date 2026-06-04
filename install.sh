@@ -116,7 +116,7 @@ link "scripts/statusline-ring.py"
 # --- VOICEVOXコマンド ---
 echo "--- VOICEVOXコマンド ---"
 mkdir -p "${HOME}/.local/bin"
-for cmd in vv vv-mute vv-voice; do
+for cmd in morning-autostart vv vv-mute vv-voice; do
   SRC="${DOTFILES_DIR}/scripts/${cmd}"
   DST="${HOME}/.local/bin/${cmd}"
   chmod +x "${SRC}"
