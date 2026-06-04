@@ -26,12 +26,16 @@
 
    a. `mcp__obsidian__read-note` でファイル内容を読む
 
-   b. **wiki 書込**（確認なしで即実行）:
-      - 既存ページがあれば merge（`mcp__obsidian__edit-note` で append または find_and_replace）
-      - 新規の場合は `mcp__obsidian__create-note` で `wiki/{category}/{title}.md` を作成
+   b. **wiki 書込（merge 優先モード）**（確認なしで即実行）:
+      1. CLAUDE.md の「育てるべき Hub ページ」リストを参照
+      2. 新ソースの主要 claim と hub の summary / tags が重なるか判定
+      3. **hub 該当 → 該当 hub を Read → merge**（`mcp__obsidian__edit-note` で append または find_and_replace）
+      4. hub 非該当 & grep で既存ページが見つかる → 既存ページに merge
+      5. どちらも非該当 → 新規作成（`mcp__obsidian__create-note` で `wiki/{category}/{title}.md`）
       - frontmatter 必須（tags / summary / related）
       - 本文に `出典: [[raw/xxx]]` を付与
       - **自動リンク**: 関連する wiki ページ名を `[[ページ名]]` 形式でリンク
+      - **hub 肥大警告**: merge 後の hub ページが 5KB を超えた場合は `⚠️ hub 肥大（5KB超）: 分割を提案` を表示
 
    c. **カテゴリ別 `_index.md` 更新**: `wiki/{カテゴリ}/_index.md` に追記
       - 形式: `- [[wiki/category/title]] — 一行説明`
@@ -67,12 +71,16 @@
    
    slug: 内容を表す英数字 kebab-case（例: `llm-wiki-pattern`）
 
-4. **wiki 書込**（確認なしで即実行）:
-   - 既存ページがあれば merge（`mcp__obsidian__edit-note` で append または find_and_replace）
-   - 新規の場合は `mcp__obsidian__create-note` で `wiki/{category}/{title}.md` を作成
+4. **wiki 書込（merge 優先モード）**（確認なしで即実行）:
+   1. CLAUDE.md の「育てるべき Hub ページ」リストを参照
+   2. 新ソースの主要 claim と hub の summary / tags が重なるか判定
+   3. **hub 該当 → 該当 hub を Read → merge**（`mcp__obsidian__edit-note` で append または find_and_replace）
+   4. hub 非該当 & grep で既存ページが見つかる → 既存ページに merge
+   5. どちらも非該当 → 新規作成（`mcp__obsidian__create-note` で `wiki/{category}/{title}.md`）
    - frontmatter 必須（tags / summary / related）
    - 本文に `出典: [[raw/xxx]]` を付与
    - **自動リンク挿入**: 関連するwikiページ名を `[[ページ名]]` に置換（コードブロック内・既存`[[]]`はスキップ）。frontmatter の `related:` にも追記
+   - **hub 肥大警告**: merge 後の hub ページが 5KB を超えた場合は `⚠️ hub 肥大（5KB超）: 分割を提案` を表示
 
 5. **カテゴリ別 `_index.md` 更新**: `wiki/{カテゴリ}/_index.md` に追記
    - 形式: `- [[wiki/category/title]] — 一行説明`

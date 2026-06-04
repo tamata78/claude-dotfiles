@@ -23,6 +23,21 @@
 
    d. **リンク密度チェック**: wiki/ で outbound wikilink（本文中の `[[]]`）が 1 個以下のページを抽出。HIGH: 0個（orphan）、MEDIUM: 1個（低密度）。MEDIUM以上なら `/vault-relink` 実行を推奨。
 
+   e. **weekly 連続性チェック**:
+      ```bash
+      ls "$OBSIDIAN_VAULT/reports/weekly/"*.md 2>/dev/null | grep -oE 'W[0-9]+' | sort
+      ```
+      直近 4 ISO週（今週含む）で欠落がある場合 HIGH として報告:
+      `[HIGH] weekly 欠落: W21 が未生成（W20, W22 存在）→ /vault-weekly-synthesis --week 2026-W21 を提案`
+
+   f. **dead wikilink 一覧**:
+      ```bash
+      grep -roh '\[\[[^]]*\]\]' "$OBSIDIAN_VAULT/wiki/" "$OBSIDIAN_VAULT/reports/" 2>/dev/null \
+        | sed 's/\[\[//;s/\]\]//' | sed 's/|.*//' | sort | uniq -c | sort -rn | head -30
+      ```
+      各リンク先が `wiki/` に実在するか確認し、**未作成リンクを参照頻度順 top 10** で報告:
+      `[MEDIUM] dead wikilink: "場面緘黙ステップアップ" 3 件参照 / 未作成 → 新規作成 or リンク先修正を提案`
+
 4. **レポート出力**: 優先度別に整理して報告
 
    ```

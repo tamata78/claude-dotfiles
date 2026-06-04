@@ -1,6 +1,9 @@
-# /vault-compress — Obsidian Wiki CTX 圧縮
+# /vault-compress — DEPRECATED 2026-06-04
 
-Vault の LLM Wiki にセッション要約を書き出し、コンテキストをクリアする準備をする。
+> **廃止済み**。sessions 層は reports/daily/ の OPEN_THREADS / DECISIONS / INSIGHTS セクションに吸収された。
+> `/clear` 前に手動操作は不要。daily-brief が毎朝自動生成する際に前日のスレッドを引き継ぐ。
+
+~~Vault の LLM Wiki にセッション要約を書き出し、コンテキストをクリアする準備をする。~~
 
 ## 手順
 
