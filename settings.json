@@ -84,6 +84,10 @@
             "type": "command",
             "command": "$HOME/.claude/hooks/session-start-snapshot.sh",
             "statusMessage": "スナップショットを確認中..."
+          },
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/furikaeri-check.sh"
           }
         ]
       }
