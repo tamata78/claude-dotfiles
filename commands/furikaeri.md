@@ -45,7 +45,7 @@ python3 ~/.local/bin/time-tracker-post.py --date ${YESTERDAY} --force
 ### 5. wkhis-extract をローカルから準備
 
 ```bash
-EXTRACT=~/work/MyVault/raw/wkhis-extract/${YESTERDAY}.md
+EXTRACT=${OBSIDIAN_VAULT}/raw/wkhis-extract/${YESTERDAY}.md
 ls "$EXTRACT" || python3 ~/.local/bin/wkhis-extract.py
 ```
 
@@ -58,7 +58,7 @@ ls "$EXTRACT" || python3 ~/.local/bin/wkhis-extract.py
 
 **データ取得:**
 - Slack #daily-log の TIME-TRACKER メッセージ（ステップ 3 か 4 で入手）
-- `~/work/MyVault/raw/wkhis-extract/${YESTERDAY}.md` を Read ツールで直読み（ステップ 5 で準備済み）
+- `${OBSIDIAN_VAULT}/raw/wkhis-extract/${YESTERDAY}.md` を Read ツールで直読み（ステップ 5 で準備済み）
 
 **生成フォーマット:**
 ```
