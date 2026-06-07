@@ -25,7 +25,24 @@ YESTERDAY=$(TZ=Asia/Tokyo date -v-1d +%Y-%m-%d)
 echo "target=$YESTERDAY"
 ```
 
-### 3. wkhis-extract をローカルから準備
+### 3. Slack #daily-log で TIME-TRACKER を検索
+
+`mcp__claude_ai_Slack__slack_search_public_and_private` ツールを使い、以下を検索する:
+
+- **TIME-TRACKER**: query = `TIME-TRACKER ${YESTERDAY}` で検索（in:#daily-log）
+
+### 4. TIME-TRACKER データが Slack にない場合 → 補完投稿
+
+TIME-TRACKER のメッセージが見つからなかった場合:
+
+```bash
+python3 ~/.local/bin/time-tracker-post.py --date ${YESTERDAY} --force
+```
+
+失敗した場合（例: snapshot.json が存在しない・権限なし）は以下を伝えて中断:
+> 「TIME-TRACKER データの補完投稿に失敗しました。time-tracker アプリを開いて設定 → スナップショット書出先 を設定してください。」
+
+### 5. wkhis-extract をローカルから準備
 
 ```bash
 EXTRACT="/Users/tamata78/work/MyVault/raw/wkhis-extract/${YESTERDAY}.md"
@@ -35,23 +52,20 @@ ls "$EXTRACT" || python3 ~/.local/bin/wkhis-extract.py
 再抽出後もファイルが存在しない場合は以下を伝えて中断:
 > 「wkhis-extract ファイルが見つかりません（${EXTRACT}）。wkhis-extract.py の実行に失敗した可能性があります。」
 
-### 4. TIME-TRACKER データ取得（オプション）
+### 6. データを取得してふりかえり本文を生成
 
-TIME-TRACKER の実績が欲しい場合は以下を実行する（失敗しても継続可）:
+以下のデータを元にふりかえり本文を生成する:
 
-```bash
-python3 ~/.local/bin/time-tracker-post.py --date ${YESTERDAY} --force 2>/dev/null || true
-```
+**データ取得:**
+- Slack #daily-log の TIME-TRACKER メッセージ（ステップ 3 か 4 で入手）
+- `${EXTRACT}` を Read ツールで直読み（ステップ 5 で準備済み）
 
-### 5. wkhis-extract を Read して本文を生成
-
-`/Users/tamata78/work/MyVault/raw/wkhis-extract/${YESTERDAY}.md` を Read ツールで直読みし、以下のフォーマットで本文を生成する:
-
+**生成フォーマット:**
 ```
 📅 ${YESTERDAY} ふりかえり
 
 【今日やったこと】
-- （wkhis の主要な作業から箇条書き 3〜5 個）
+- （TIME-TRACKER の実績・wkhis の主要な作業から箇条書き 3〜5 個）
 
 【気づき・学び】
 - （作業から得られた気づきや学び）
@@ -60,44 +74,20 @@ python3 ~/.local/bin/time-tracker-post.py --date ${YESTERDAY} --force 2>/dev/nul
 - （明日意識したいこと or 試したいこと）
 ```
 
-### 6. Slack #日々のふりかえり に curl で投稿
+### 7. Slack #日々のふりかえり に投稿
 
-credentials から webhook URL を読み込んで投稿する。`$TEXT` には手順 5 で生成した本文を入れる。
+`mcp__claude_ai_Slack__slack_send_message` で以下に投稿する:
+- channel: `#日々のふりかえり`
+- text: 上記で生成したテキスト
 
-```bash
-CRED_FILE="$HOME/.config/wkhis-sync/credentials"
-WEBHOOK=$(grep '^SLACK_WEBHOOK_FURIKAERI=' "$CRED_FILE" 2>/dev/null | cut -d= -f2-)
-```
-
-- **webhook 設定済みの場合**: JSON エスケープして curl で POST する
-  ```bash
-  ESCAPED=$(printf '%s' "$TEXT" | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))")
-  curl -s -X POST "$WEBHOOK" -H 'Content-Type: application/json' -d "{\"text\": $ESCAPED}"
-  ```
-- **webhook 未設定の場合**: 本文をテキストで出力し、以下を伝えて終了:
-  > 「`~/.config/wkhis-sync/credentials` の `SLACK_WEBHOOK_FURIKAERI=` に URL を設定してください（Slack App管理 > Incoming Webhooks から #日々のふりかえり 向けに発行）」
-
-### 7. 送信済みフラグを記録
+### 8. 送信済みフラグを記録
 
 ```bash
 TZ=Asia/Tokyo date +%Y-%m-%d > ~/.claude/furikaeri-last-date
 ```
 
-### 8. 結果を1行で報告
+### 9. 結果を1行で報告
 
-webhook 設定済みの場合:
 ```
 ✅ ふりかえりを #日々のふりかえり に投稿しました
-```
-
-webhook 未設定の場合:
-```
-⚠️ webhook 未設定のため手動投稿が必要です。以下の本文をコピーしてください:
-（本文）
-```
-
-## 完了通知
-
-```bash
-~/.local/bin/vv "ふりかえりが完成したのだ"
 ```
