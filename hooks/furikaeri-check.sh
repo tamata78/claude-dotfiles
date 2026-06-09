@@ -10,7 +10,7 @@ cat <<EOF
 {
   "hookSpecificOutput": {
     "hookEventName": "SessionStart",
-    "additionalContext": "⚠️ 昨日分のふりかえりが未送信です（last=${LAST}, today=${TODAY}）。最初のユーザー応答に入る前に /furikaeri を実行して #日々のふりかえり に投稿してください。"
+    "additionalContext": "💬 昨日分のふりかえりが未投稿です（last=${LAST}, today=${TODAY}）。現在のタスク完了後に /furikaeri を実行してください。"
   }
 }
 EOF

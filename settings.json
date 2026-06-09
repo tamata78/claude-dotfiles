@@ -177,5 +177,8 @@
   "effortLevel": "high",
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
-  "voiceEnabled": true
+  "voiceEnabled": true,
+  "enabledPlugins": {
+    "slack@claude-plugins-official": true
+  }
 }
