@@ -18,12 +18,12 @@ description: "個人用Mac向け朝ルーティン。time-tracker優先目標×w
 
 ## Step 2. データ収集（すべて並列実行）
 
-以下の 2-A〜2-G を **1つの応答内で同時** に実行する。
+以下の 2-A〜2-F を **1つの応答内で同時** に実行する。
 
 ### 2-A. time-tracker 優先目標（固定リスト）
 
 以下を前提とする（`~/work/time-tracker/src/App.tsx` の `seedPrioritiesOnce()` より）。
-スキル実行時に App.tsx を Read して差分があれば更新すること。
+**月曜のみ** App.tsx を Read して差分があれば更新する。火〜日は固定リストをそのまま使う。
 
 ```
 【緊急・重要 (priority)】
@@ -127,12 +127,14 @@ PYEOF
 
 出力された TSV を保持する（HTMLチャート生成で使用）。
 
-### 2-D. 直近 daily-brief の PATTERN / QUESTION（log.md は参照しない）
+### 2-D. 直近 daily-brief の PATTERN / QUESTION / OPEN_THREADS（log.md は参照しない）
 
 ```bash
-LATEST=$(ls -t ~/work/MyVault/reports/daily/*.html 2>/dev/null | head -1)
-[ -n "$LATEST" ] && grep -m5 -E "(PATTERN|QUESTION|<h2)" "$LATEST" 2>/dev/null
+LATEST=$(ls -t ~/work/MyVault/reports/daily/*.md 2>/dev/null | head -1)
+[ -n "$LATEST" ] && sed -n '/^## PATTERN/,$p' "$LATEST"
 ```
+
+PATTERN / QUESTION / OPEN_THREADS の3節を保持する。OPEN_THREADS は Step 3-4 の TOP3 選定入力、PATTERN / QUESTION は Phase 2 節の表示に使う。
 
 ### 2-F. 関心トピック（直近7日）
 
@@ -141,13 +143,6 @@ find ~/work/MyVault/ideas ~/work/MyVault/wiki -name '*.md' -mtime -7 -type f 2>/
 ```
 
 ファイル名一覧のみ取得。中身の Read は不要。
-
-### 2-G. 学習復習候補
-
-```bash
-grep -rl "confidence: low" ~/work/MyVault/wiki/ 2>/dev/null | head -5
-grep -rl "last_verified: 202[45]" ~/work/MyVault/wiki/ 2>/dev/null | head -5
-```
 
 ---
 
@@ -176,7 +171,7 @@ grep -rl "last_verified: 202[45]" ~/work/MyVault/wiki/ 2>/dev/null | head -5
 - `中学校先生と6/14チャレンジ面談 — 具体的なゴールを合意できた`
 - `振り返り 5日連続で記録 — ルーティンの質が上がっている`
 
-### 3-3. 目標別レビュー（8目標全評価）
+### 3-3. 目標別レビュー（動いた目標のみ詳細）
 
 2-A の 8目標それぞれについて、2-B の wkhis データから以下を評価:
 
@@ -186,8 +181,15 @@ grep -rl "last_verified: 202[45]" ~/work/MyVault/wiki/ 2>/dev/null | head -5
 | ⚠️ 断片的 | 出現1〜2日 OR 累計1h未満 |
 | ✗ 未記録 | 7日間で出現0回 |
 
+**✗ 未記録の目標はカードを作らない。**「未記録: X, Y, Z」の1行に集約し、詳細は「保留中/積み残し」節に委ねる（毎朝の断罪羅列を避ける）。
+
+**例外: 目標1「みゆ緘黙」は時間でなく回数・Lv で評価する**（主指標 = 回数・難易度感変化。2026-06-01 評価軸転換）:
+- **チャレンジ回数**: wkhis 7日間のチャレンジ出現回数 + 連続日数（2日以上続いていれば「X日連続🔥」を表示）
+- **Lv / 難易度変化**: wkhis 記述から難易度の上げ下げ・場面の変化を1行で
+- **本人発の言葉**: 7日間で「みゆが自分から言った言葉」の記録が 0 件なら ⚠️「本人の言葉 未記録 — 親設計独走サイン（緘黙plan運用ルール §C）」を必ず付記
+
 **カード記述の順番を厳守:**
-1. **できたこと**（事実）: 「N日 / 累計Xh / 具体的にしたこと」
+1. **できたこと**（事実）: 「N日 / 累計Xh / 具体的にしたこと」（みゆ緘黙は「N回 / X日連続 / Lv変化」）
 2. **残り課題**（次のアクション）: 「残N日 / 未着手の具体的な1アクション」
 
 ### 3-4. TOP3 抽出
@@ -197,17 +199,16 @@ grep -rl "last_verified: 202[45]" ~/work/MyVault/wiki/ 2>/dev/null | head -5
 | 優先度 | 条件 |
 |---|---|
 | P0 最優先 | 日付が明示されている期限（例: 6/14 残N日） |
-| P1 高 | 本人が wkhis/daily-brief で「やった方がいい」「聞いた方がいい」と認識済み |
+| P1 高 | 2-D の OPEN_THREADS にある未完了スレッド / 本人が wkhis・daily-brief で「やった方がいい」と認識済み |
 | P2 中 | ⚠️ または ✗ のうち、放置すると連鎖影響が大きいもの |
 
 各 TOP3 は「今日の具体的な1アクション」を箇条書きで 2〜3 個記載。
 
 ### 3-5. 学習トピック選出（1〜2件）
 
-候補は以下の3カテゴリのみ:
-1. **[復習]** 2-G で見つかった `confidence: low` または `last_verified` 60日以上前のページ
-2. **[深掘り]** 2-F 直近7日の ideas/ メモ
-3. **[メモ化]** 2-E の QUESTION への自分なりの回答を `ideas/` に書く
+候補は以下の2カテゴリのみ:
+1. **[深掘り]** 2-F 直近7日の ideas/ メモ
+2. **[メモ化]** 2-D の QUESTION への自分なりの回答を `ideas/` に書く
 
 候補がなければ「今日 ideas/ に気づきを1つ書く」を提案。
 
@@ -288,9 +289,11 @@ DOW=$(date +%u)   # 1=月 〜 5=金 → 平日 / 6=土,7=日 → 休日
   ※共通パターン（繰り返し課題があれば1行で）
 
   1. {バッジ} {目標名}
-     できたこと: {具体}
+     できたこと: {具体}（みゆ緘黙は N回 / X日連続🔥 / Lv変化 / 本人の言葉 有無）
      残り課題: {具体 + 期限}
-  ...
+  ...（✅⚠️ のみ。✗ はカード化しない）
+
+  ✗ 未記録: {目標名をカンマ区切りで1行}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🎯 優先課題 TOP3 — 今日やること
@@ -344,8 +347,9 @@ DOW=$(date +%u)   # 1=月 〜 5=金 → 平日 / 6=土,7=日 → 休日
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 💭 Phase 2 連動
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  本日 daily-brief → {PATTERN / QUESTION の要点}
-  → 「デイリーブリーフを実行して」と入力
+  本日 daily-brief（launchd 自動生成済み）より:
+  PATTERN: {2-D の PATTERN 要点}
+  QUESTION: {2-D の QUESTION}
   ※ 月曜日の場合: 「週次シンセシスを実行して」も推奨
 ```
 
@@ -614,7 +618,7 @@ DOW=$(date +%u)   # 1=月 〜 5=金 → 平日 / 6=土,7=日 → 休日
 
 ### レビュー details 生成ルール
 
-3-3 の評価に基づき、各目標を `details` で生成。`details` は **常に open** にして目立たせる:
+3-3 の評価に基づき、**✅⚠️ の目標のみ** `details` で生成（✗ 未記録は details 群の末尾に `<div class="hold-item">✗ 未記録: X, Y, Z</div>` の1行で集約）。みゆ緘黙カードは「N回 / X日連続🔥 / Lv変化 / 本人の言葉 有無」を記載。`details` は **常に open** にして目立たせる:
 ```html
 <details open>
   <summary>
