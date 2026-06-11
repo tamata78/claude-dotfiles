@@ -94,6 +94,7 @@ link "commands/release.md"
 link "commands/dependency-audit.md"
 link "commands/create-release-back-merge-pr.md"
 link "commands/create-github-release.md"
+link "commands/create-pr.md"
 # disabled — _disabled/ に移動済み（debug / rpi / team）
 link_dir "commands/_disabled"
 

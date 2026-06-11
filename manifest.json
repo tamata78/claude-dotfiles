@@ -28,6 +28,7 @@
     "commands/dependency-audit.md": { "scope": "common", "type": "command", "use": "work" },
     "commands/create-release-back-merge-pr.md": { "scope": "common", "type": "command", "use": "work" },
     "commands/create-github-release.md": { "scope": "common", "type": "command", "use": "work" },
+    "commands/create-pr.md": { "scope": "common", "type": "command", "use": "work" },
     "commands/_disabled/debug.md": { "scope": "common", "type": "command", "status": "disabled" },
     "commands/_disabled/rpi.md": { "scope": "common", "type": "command", "status": "disabled" },
     "commands/_disabled/team.md": { "scope": "common", "type": "command", "status": "disabled" },
