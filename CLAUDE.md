@@ -28,6 +28,11 @@
 - 50%到達で `/compact` 実行。`/sandbox` で権限プロンプト削減。
 - CLAUDE.md は 200 行 / 25KB 以下に保つ。超過分は `docs/` に分離し、必要時のみ `@docs/xxx.md` で読込。
 
+## Mac 運用ルール（Intel 8GB / MacBook Air 2015）
+- 常駐アプリは 4本まで（Obsidian・Chrome・Claude Code・Slack）。Zoom/通話時は Chrome を閉じる
+- 重い探索・検索は Explore サブエージェント（Haiku）に委譲してメインを軽く保つ
+- 就寝前は毎日再起動（swap/compressor リセット）
+
 ## プラン完了後
 計画をユーザーに提示・承認後、必ず「`/clear` を実行してから実装へ」と促す。
 

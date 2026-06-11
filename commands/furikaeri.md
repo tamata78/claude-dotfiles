@@ -22,17 +22,14 @@ echo "today=$TODAY last=$LAST"
 
 ```bash
 YESTERDAY=$(TZ=Asia/Tokyo date -v-1d +%Y-%m-%d)
-MONTH=$(TZ=Asia/Tokyo date -v-1d +%-m)
-DAY=$(TZ=Asia/Tokyo date -v-1d +%-d)
-echo "target=$YESTERDAY  month/day=${MONTH}/${DAY}"
+echo "target=$YESTERDAY"
 ```
 
-### 3. Slack #daily-log で昨日分のデータを検索
+### 3. Slack #daily-log で TIME-TRACKER を検索
 
-`mcp__claude_ai_Slack__slack_search_public_and_private` ツールを使い、以下の 2 件を検索する:
+`mcp__claude_ai_Slack__slack_search_public_and_private` ツールを使い、以下を検索する:
 
 - **TIME-TRACKER**: query = `TIME-TRACKER ${YESTERDAY}` で検索（in:#daily-log）
-- **wkhis**: query = `wkhis` で検索し、結果に `${MONTH}/${DAY}(` または `${YESTERDAY}` が含まれるメッセージを探す
 
 ### 4. TIME-TRACKER データが Slack にない場合 → 補完投稿
 
@@ -45,33 +42,23 @@ python3 ~/.local/bin/time-tracker-post.py --date ${YESTERDAY} --force
 失敗した場合（例: snapshot.json が存在しない・権限なし）は以下を伝えて中断:
 > 「TIME-TRACKER データの補完投稿に失敗しました。time-tracker アプリを開いて設定 → スナップショット書出先 を設定してください。」
 
-### 5. wkhis データが Slack にない場合 → 補完投稿
+### 5. wkhis-extract をローカルから準備
 
-wkhis のメッセージが見つからなかった場合:
-
-まずローカルファイルを確認:
 ```bash
-ls ~/work/MyVault/raw/wkhis-extract/${YESTERDAY}.md
+EXTRACT="/Users/tamata78/work/MyVault/raw/wkhis-extract/${YESTERDAY}.md"
+ls "$EXTRACT" || python3 ~/.local/bin/wkhis-extract.py
 ```
 
-ファイルが存在しない場合は再抽出を試みる:
-```bash
-python3 ~/.local/bin/wkhis-extract.py
-```
-
-その後、Slack に補完投稿:
-```bash
-~/.local/bin/wkhis-post-from-extract.sh ${YESTERDAY}
-```
+再抽出後もファイルが存在しない場合は以下を伝えて中断:
+> 「wkhis-extract ファイルが見つかりません（${EXTRACT}）。wkhis-extract.py の実行に失敗した可能性があります。」
 
 ### 6. データを取得してふりかえり本文を生成
 
-補完投稿した場合は 2-3 秒待ち、以下のデータを元にふりかえり本文を生成する:
+以下のデータを元にふりかえり本文を生成する:
 
-**データ取得優先順位（Slack → ローカルの順）:**
+**データ取得:**
 - Slack #daily-log の TIME-TRACKER メッセージ（ステップ 3 か 4 で入手）
-- Slack #daily-log の wkhis メッセージ（ステップ 3 か 5 で入手）
-- 上記が取れなければ: `~/work/MyVault/raw/wkhis-extract/${YESTERDAY}.md` を Read ツールで読む
+- `${EXTRACT}` を Read ツールで直読み（ステップ 5 で準備済み）
 
 **生成フォーマット:**
 ```
@@ -101,6 +88,6 @@ TZ=Asia/Tokyo date +%Y-%m-%d > ~/.claude/furikaeri-last-date
 
 ### 9. 結果を1行で報告
 
-補完投稿の有無を含めて報告する。例:
-> 「✅ ふりかえりを #日々のふりかえり に投稿しました（TIME-TRACKER・wkhis ともに Slack 済み）」
-> 「✅ ふりかえりを投稿しました（TIME-TRACKER・wkhis を #daily-log に補完投稿してから実行）」
+```
+✅ ふりかえりを #日々のふりかえり に投稿しました
+```
