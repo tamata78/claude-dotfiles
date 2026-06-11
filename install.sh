@@ -106,8 +106,12 @@ link "hooks/risk-analyzer.py"
 link "hooks/session-start-snapshot.sh"
 link "hooks/operation-logger.py"
 link "hooks/post-risk-logger.py"
+link "hooks/harvest-reminder.sh"
+link "hooks/review-rules-reminder.sh"
 chmod +x "${DOTFILES_DIR}/hooks/pre-compact-save.sh"
 chmod +x "${DOTFILES_DIR}/hooks/session-start-snapshot.sh"
+chmod +x "${DOTFILES_DIR}/hooks/harvest-reminder.sh"
+chmod +x "${DOTFILES_DIR}/hooks/review-rules-reminder.sh"
 
 # --- スクリプト ---
 echo "--- スクリプト ---"

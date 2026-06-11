@@ -40,6 +40,8 @@
     "hooks/session-start-snapshot.sh": { "scope": "common", "type": "hook" },
     "hooks/post-risk-logger.py": { "scope": "common", "type": "hook" },
     "hooks/skill-usage-tracker.py": { "scope": "common", "type": "hook" },
+    "hooks/harvest-reminder.sh": { "scope": "common", "type": "hook" },
+    "hooks/review-rules-reminder.sh": { "scope": "common", "type": "hook" },
     "scripts/statusline-ring.py": { "scope": "common", "type": "script" },
     "scripts/vv": { "scope": "common", "type": "script" },
     "scripts/vv-mute": { "scope": "common", "type": "script" },
